@@ -42,8 +42,8 @@ def train(features, labels, model, lossfunc, optimizer, num_epoch, BATCH_SIZE):
     # TODO: Step 1 - create torch variables corresponding to features and labels
     features_torch = torch.from_numpy(features)
     labels_torch = torch.from_numpy(labels)
-    dataset = TensorDataset(features_torch, labels_torch)
-    dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
+    dataset = torch.utils.data.TensorDataset(features_torch, labels_torch)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
     
     for epoch in range(num_epoch):
         
