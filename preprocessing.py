@@ -17,7 +17,7 @@ def split_file(input_file, output_file):
   seq_start_list = []
   seq_end_list = []
   
-  
+ 
   for fasta in fasta_sequences:
     name, sequence = fasta.id, str(fasta.seq)
     sequence_start, sequence_end = split_sequence(sequence)
@@ -26,38 +26,47 @@ def split_file(input_file, output_file):
     
   count_true = 0
   count_false = 0
-  with open(output_file, "w") as seq_file:    
-    for start in seq_start_list:
-      for end in seq_end_list:
+  for index, start in enumerate(seq_start_list):
+    file = output_file.split('.')[0] + str(index)+'.csv'
+    
+    with open(file, "w") as seq_file:    
+      for index, end in enumerate(seq_end_list):
         label = 0
         if start[0] == end[0]: 
           label = 1
           count_true += 1
+        else:
+          count_false += 1
         seq_file.write(start[0] + "<>" + end[0] + ";" + start[1] + ";" + end[1] + ";" + str(label) + "\n")
-        count_false += 1
         
     seq_file.close()
-    return count_true, count_false
+        
+  return count_true, count_false
+
 
 def get_csv_line(path, line_number):
     with open(path) as f:
         return next(itertools.islice(csv.reader(f), line_number, None))
 
 
-def load_batch(path, line_numbers):
+
+def load_batch(path, file_indices, row_indices, batch_size):
     
     batch = pd.DataFrame(columns = ["name", "first half", "second half", "label"])
-    
-    for index, line_number in enumerate(line_numbers):
-        line = get_csv_line(path, line_number)
-   
+    for i in range(batch_size):
+        
+        file = path.split('.')[0] + str(file_indices[i])+'.csv'
+      
+        line = get_csv_line(file, row_indices[i])
+       
+        
         name, start, end, label = line[0].split(';')
         start_encoded = into_binary(start)
         end_encoded = into_binary(end)
         
         batch = batch.append({"name" : name, "first half":start_encoded,
                               "second half":end_encoded, "label":label}, ignore_index=True)
-        print(index)
+        
         
     return batch
 
@@ -85,15 +94,14 @@ def create_batch_input(batch):
     for index in range(len(batch)):
         batch_input.append(compare_sequences(batch["first half"][index], batch["second half"][index]))
     
-    
-    
     return np.array(batch_input) 
 
-def build_k_indices(num_row, k_fold, seed):
+def build_k_indices(num_row, k_fold, shape, seed):
     """build k indices for k-fold."""
     interval = int(num_row / k_fold)
     np.random.seed(seed)
     indices = np.random.permutation(num_row)
     k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
-    return np.array(k_indices)
+    np.array(k_indices)
+    return np.unravel_index(k_indices, shape)
   

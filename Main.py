@@ -2,11 +2,10 @@ from preprocessing import *
 from consts import *
 from neural_network import *
 import time
-import sh
 
 def encoding():
 
-    unique_letters = ['V', 'W', 'H', 'G', 'T', 'Q', 'A', 'C', 'S', 'K', 'Y', 'L', 'R', 'D', 'M', 'E', 'I', 'F', 'N', 'P', '-']
+    unique_letters = ['V', 'W', 'H', 'G', 'T', 'Q', 'A', 'C', 'S', 'K', 'Y', 'L', 'R', 'D', 'M', 'E', 'I', 'F', 'N', 'P', '-', 'X']
 
     for index, letter in enumerate(unique_letters):
         PROTEIN_ENCODING[letter] = [0 for _ in range(len(unique_letters))]
@@ -25,14 +24,17 @@ print(count_true, count_false)
 start = time.time()
 
 batch_size = 1000
-line_numbers = build_k_indices(count_true + count_false, batch_size, seed = 2)  # Create batches of random entries
+shape = (count_true, count_true) # count_true = N_files
 
-for serie in line_numbers:
+line_numbers = build_k_indices(count_true + count_false, batch_size, shape, seed = 1)  # Create batches of random entries
+
+start = time.time()
+for i in range(len(line_numbers[0][0])):
   print("time taken:", time.time() - start)
-  batch = load_batch(seq_file, serie)
+  batch = load_batch(seq_file, line_numbers[0][:,i], line_numbers[1][:,i], batch_size)
   batch_input = create_batch_input(batch)
   labels = batch["label"].astype(int).to_numpy()
-  sh.shuf("words.txt", out="shuffled_words.txt")
+  
 
 end = time.time()
 print(end - start)  
