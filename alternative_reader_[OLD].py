@@ -1,14 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Nov 30 22:15:03 2021
-Alternative for reading the data, creates less false inputs
-@author: jurri
-"""
 from Bio import SeqIO
-import csv
-import itertools
-import pandas as pd
-import numpy as np
 from consts import * 
 
 def split_sequence(sequence):
