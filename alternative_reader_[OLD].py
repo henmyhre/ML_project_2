@@ -12,7 +12,6 @@ def split_file(input_file, output_file):
   
   seq_start_list = []
   seq_end_list = []
-  
  
   for fasta in fasta_sequences:
     name, sequence = fasta.id, str(fasta.seq)
