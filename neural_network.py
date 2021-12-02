@@ -6,13 +6,18 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 
 class MLP(nn.Module):
-  def __init__(self, hidden_size):
+  def __init__(self, hidden_size, lossfunc):
     super(MLP, self).__init__()
 
     self.linear_1 = nn.Linear(1, hidden_size)
     self.linear_2 = nn.Linear(hidden_size, hidden_size)
     self.linear_3 = nn.Linear(hidden_size, 1)
-  
+
+    self.lossfunc = lossfunc
+
+  def set_optimizer(self):
+    self.optimizer=torch.optim.SGD(self.parameters(), lr=1e-3)
+    
   def forward(self, x):
     x1 = torch.sigmoid(self.linear_1(x))
     x2 = torch.sigmoid(self.linear_2(x1))

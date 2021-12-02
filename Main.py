@@ -4,8 +4,8 @@ from neural_network import *
 import time  
 import os     
 
-def main(force_save_seq = False): 
-  
+
+def preprocessing(force_save_seq):
   if (len(BINARY_ENCODING) == 0) or (len(PROTEIN_ENCODING) == 0):  
     # Create dictionaries for encoding proteins
     create_encoding_dictionaries()
@@ -27,31 +27,45 @@ def main(force_save_seq = False):
     
     count_true, count_false = [int(count) for count in counts[0].split(";")]
     print("Skipped saving to files. " + "True count: " + str(count_true) + "; False count: " + str(count_false))
-    
+
+  return count_true, count_false
+
+
+def create_model():
+  model = MLP(hidden_size=2, lossfunc=nn.MSELoss())
+  model.set_optimizer()
+  
+  return model
+
+
+def train_model(count_true, count_false, model):
   start = time.time()
 
   batch_size = 1000
   shape = (count_true, count_true) # count_true = N_files
-
+  
   line_numbers = build_k_indices(count_true + count_false, batch_size, shape, seed = 1)  # Create batches of random entries
-  #print(line_numbers)
-  start = time.time()
+
   for i in range(len(line_numbers[0][0])):
-    print("time taken:", time.time() - start)
+    print(str(i) + "th iteration. Time taken:", time.time() - start)
     batch = load_batch(seq_file_path, line_numbers[0][:,i], line_numbers[1][:,i], batch_size)
-    #print(i, batch)
     batch_input = create_batch_input(batch)
-    #print(i, batch_input)
     labels = batch["label"].astype(int).to_numpy()
-    
 
   end = time.time()
-  print(end - start)  
+  print("Training time: " + str(end - start))
 
-  model = MLP(hidden_size=2)
-  optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
-  lossfunc = nn.MSELoss()
+  train(batch_input, labels, model, model.lossfunc, model.optimizer, 1, batch_size)
 
-  train(batch_input, labels, model, lossfunc, optimizer, 1, batch_size)
+
+def main(force_save_seq = False): 
+  
+  count_true, count_false = preprocessing(force_save_seq)
+  
+  model = create_model(count_true, count_false)
+  
+  train_model(count_true, count_false, model)
+    
+
 
 main()
