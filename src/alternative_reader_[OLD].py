@@ -1,5 +1,5 @@
 from Bio import SeqIO
-from consts import * 
+from src.CONSTS import * 
 
 def split_sequence(sequence):
   seq_len = len(sequence)
