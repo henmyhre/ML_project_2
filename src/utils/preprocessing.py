@@ -6,9 +6,9 @@ import numpy as np
 from src.CONSTS import * 
 from csv import reader
 import random
-import shutil
-from utils.utils import *
+from src.utils.utils import *
 import os
+import time
  
 
 def create_encoding_dictionaries(): 
@@ -39,7 +39,8 @@ def split_file():
     seq_start_list.append([name, sequence_start])
     seq_end_list.append([name, sequence_end])
   
-  with open(seq_true_file_path, "w") as seq_true_file, open(seq_false_file_path, "w") as seq_false_file: 
+  
+  with open(seq_true_file_path, "w+") as seq_true_file, open(seq_false_file_path, "w+") as seq_false_file: 
     for start in seq_start_list:   
       for end in seq_end_list:
         
@@ -47,58 +48,80 @@ def split_file():
         if start[0] == end[0]: 
           seq_true_file.write(name_and_seq + ";1\n")
         else:
-          seq_true_file.write(name_and_seq + ";0\n")
+          seq_false_file.write(name_and_seq + ";0\n")
 
-      import random
-    
     seq_true_file.close()
     seq_false_file.close()
+  
+
+def read_lines(file):
+  return open(file).readlines()
+
+def write_lines(file, lines):
+  open(file, 'w').writelines(lines)
+  
+def append_lines(file, lines):
+  open(file, 'a').writelines(lines)
+
+def shuffle_lines(lines):
+  return random.shuffle(lines)
 
 
 def shuffle_file_rows(file):
-  with open(file, "w") as f:
-    lines = f.readlines()
-    random.shuffle(lines)
-    f.writelines(lines)
-    file.close()
+  lines = read_lines(file)
+  shuffle_lines(lines)
+  write_lines(file, lines)
+
+
+def append_csv_rows_to_new_csv(src, dst, amount, row_size):
+  lines = read_lines(src)[:amount-1]
+  shuffle_lines(lines)
+  append_lines(dst, lines)
+  """
+  for i in range(1, amount, row_size):
+    df = pd.read_csv(src,
+        header=None,
+        nrows = row_size,
+        skiprows = i)
+  df.to_csv(dst,
+        index=False,
+        header=False,
+        mode='a',
+        chunksize=row_size)
+        """
   
-    
+
 def create_train_test_data(false_per_true):
   
+  true_amount = num_of_sequences
   false_amount = num_of_sequences*false_per_true
   
   clear_file(preprocessed_data_file_path)
   
-  shutil.copyfile(seq_true_file_path, preprocessed_data_file_path)
+  append_csv_rows_to_new_csv(seq_true_file_path, preprocessed_data_file_path, true_amount, 1000)
+  append_csv_rows_to_new_csv(seq_false_file_path, preprocessed_data_file_path, false_amount, 1000)
 
-  row_size = 1000
-  for i in range(1, false_amount, row_size):
-    df = pd.read_csv(seq_false_file_path,
-          header=None,
-          nrows = row_size,
-          skiprows = i)
-    df.to_csv(preprocessed_data_file_path,
-          index=False,
-          header=False,
-          mode='a',
-          chunksize=row_size)
-    
-  
-def preprocessing(force_save_seq = False, false_per_true = 10):
+
+def preprocessing(force_save_seq = False, false_per_true = 1):
   if (len(BINARY_ENCODING) == 0) or (len(PROTEIN_ENCODING) == 0):  
     # Create dictionaries for encoding proteins
     create_encoding_dictionaries()
     
   # Create CSV files and get size of true and false data
   if (os.stat(preprocessed_data_file_path).st_size == 0) or force_save_seq:
-    print("Starting saving to files")
+    start = time.time()
+    print("Time: ",  int(time.time() - start), "Starting saving to files")
     split_file()
-    print("Done saving to files. Shuffling...")
+    print("Time: ",  int(time.time() - start), "Done saving to files true false files. Shuffling...")
     
     shuffle_file_rows(seq_true_file_path)
     shuffle_file_rows(seq_false_file_path)
-    print("Done shuffling.")
+    print("Time: ",  int(time.time() - start), "Done shuffling. Saving to preprocessed data...")
     
     create_train_test_data(false_per_true)
+    print("Time: ",  int(time.time() - start), "Done saving finished preprocessed data. Shuffling...")
+    shuffle_file_rows(preprocessed_data_file_path)
+    print("Time: ",  int(time.time() - start), "Done with preprocessing.")
+    
     
   else: print("Skipped saving to files.")

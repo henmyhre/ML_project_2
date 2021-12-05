@@ -1,12 +1,10 @@
 
 raw_data_file_path = "data/NoGapsMSA_SIS1-on-top.fasta"
 
-seq_true_file_path = "data/seq_true.csv"
-seq_false_file_path = "data/seq_false.csv"
+seq_true_file_path = "data/sequences_true.csv"
+seq_false_file_path = "data/sequences_false.csv"
 
-num_true_false_file_path = "data/num_true_false_seq.csv"
-
-preprocessed_data_file_path = "data/preprocessed_data.csv"
+preprocessed_data_file_path = "data/train_test_data.csv"
 
 num_of_sequences = 5353
 
