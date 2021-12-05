@@ -1,6 +1,5 @@
 from Bio import SeqIO
 from src.CONSTS import * 
-import random
 from src.utils.utils import *
 import time
  
@@ -12,15 +11,9 @@ def create_encoding_dictionaries():
 
     # Inverse dictionary
     BINARY_ENCODING[str(PROTEIN_ENCODING[letter])] = letter
-
-
-def split_sequence(sequence):
-  seq_len = len(sequence)
-  start, end = sequence[:int(seq_len/2)], sequence[int(seq_len/2):]
-  return start, end
     
 
-def split_file():
+def split_raw_data_file():
   
   fasta_sequences = SeqIO.parse(open(raw_data_file_path),'fasta')
   
@@ -48,31 +41,6 @@ def split_file():
     seq_false_file.close()
   
 
-def read_lines(file):
-  return open(file).readlines()
-
-def write_lines(file, lines):
-  open(file, 'w').writelines(lines)
-  
-def append_lines(file, lines):
-  open(file, 'a').writelines(lines)
-
-def shuffle_lines(lines):
-  return random.shuffle(lines)
-
-
-def shuffle_file_rows(file):
-  lines = read_lines(file)
-  shuffle_lines(lines)
-  write_lines(file, lines)
-
-
-def append_csv_rows_to_new_csv(src, dst, amount, row_size):
-  lines = read_lines(src)[:amount-1]
-  shuffle_lines(lines)
-  append_lines(dst, lines)
-  
-
 def create_train_test_data(false_per_true):
   
   true_amount = num_of_sequences
@@ -80,12 +48,8 @@ def create_train_test_data(false_per_true):
   
   clear_file(preprocessed_data_file_path)
   
-  append_csv_rows_to_new_csv(seq_true_file_path, preprocessed_data_file_path, true_amount, 1000)
-  append_csv_rows_to_new_csv(seq_false_file_path, preprocessed_data_file_path, false_amount, 1000)
-
-
-def get_time_dif_str(start):
-  return "Time: " + str(int(time.time() - start))
+  append_csv_rows_to_new_csv(seq_true_file_path, preprocessed_data_file_path, true_amount)
+  append_csv_rows_to_new_csv(seq_false_file_path, preprocessed_data_file_path, false_amount)
 
 
 def preprocessing(force_save_seq = False, false_per_true = 1):
@@ -95,8 +59,9 @@ def preprocessing(force_save_seq = False, false_per_true = 1):
     
   if force_save_seq:
     start = time.time()
+    
     print(get_time_dif_str(start), "Starting saving to files")
-    split_file()
+    split_raw_data_file()
     print(get_time_dif_str(start), "Done saving to files true false files. Shuffling...")
     
     shuffle_file_rows(seq_true_file_path)
@@ -105,8 +70,8 @@ def preprocessing(force_save_seq = False, false_per_true = 1):
     
     create_train_test_data(false_per_true)
     print(get_time_dif_str(start), "Done saving finished preprocessed data. Shuffling...")
+    
     shuffle_file_rows(preprocessed_data_file_path)
     print(get_time_dif_str(start), "Done with preprocessing.")
-    
     
   else: print("Skipped saving to files.")
