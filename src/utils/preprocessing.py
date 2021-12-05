@@ -1,13 +1,7 @@
 from Bio import SeqIO
-import csv
-import itertools
-import pandas as pd
-import numpy as np
 from src.CONSTS import * 
-from csv import reader
 import random
 from src.utils.utils import *
-import os
 import time
  
 
@@ -77,18 +71,6 @@ def append_csv_rows_to_new_csv(src, dst, amount, row_size):
   lines = read_lines(src)[:amount-1]
   shuffle_lines(lines)
   append_lines(dst, lines)
-  """
-  for i in range(1, amount, row_size):
-    df = pd.read_csv(src,
-        header=None,
-        nrows = row_size,
-        skiprows = i)
-  df.to_csv(dst,
-        index=False,
-        header=False,
-        mode='a',
-        chunksize=row_size)
-        """
   
 
 def create_train_test_data(false_per_true):
@@ -102,26 +84,29 @@ def create_train_test_data(false_per_true):
   append_csv_rows_to_new_csv(seq_false_file_path, preprocessed_data_file_path, false_amount, 1000)
 
 
+def get_time_dif_str(start):
+  return "Time: " + str(int(time.time() - start))
+
+
 def preprocessing(force_save_seq = False, false_per_true = 1):
   if (len(BINARY_ENCODING) == 0) or (len(PROTEIN_ENCODING) == 0):  
     # Create dictionaries for encoding proteins
     create_encoding_dictionaries()
     
-  # Create CSV files and get size of true and false data
-  if (os.stat(preprocessed_data_file_path).st_size == 0) or force_save_seq:
+  if force_save_seq:
     start = time.time()
-    print("Time: ",  int(time.time() - start), "Starting saving to files")
+    print(get_time_dif_str(start), "Starting saving to files")
     split_file()
-    print("Time: ",  int(time.time() - start), "Done saving to files true false files. Shuffling...")
+    print(get_time_dif_str(start), "Done saving to files true false files. Shuffling...")
     
     shuffle_file_rows(seq_true_file_path)
     shuffle_file_rows(seq_false_file_path)
-    print("Time: ",  int(time.time() - start), "Done shuffling. Saving to preprocessed data...")
+    print(get_time_dif_str(start), "Done shuffling. Saving to preprocessed data...")
     
     create_train_test_data(false_per_true)
-    print("Time: ",  int(time.time() - start), "Done saving finished preprocessed data. Shuffling...")
+    print(get_time_dif_str(start), "Done saving finished preprocessed data. Shuffling...")
     shuffle_file_rows(preprocessed_data_file_path)
-    print("Time: ",  int(time.time() - start), "Done with preprocessing.")
+    print(get_time_dif_str(start), "Done with preprocessing.")
     
     
   else: print("Skipped saving to files.")

@@ -25,16 +25,15 @@ class MLP(nn.Module):
     
   def train(self, features, labels, num_epoch, BATCH_SIZE):
     
-    """train a model for num_epoch epochs on the given data
+    """
+    Train a model for num_epoch epochs on the given data
     
     Inputs:
-        features: a numpy array
-        labels: a numpy array
-        model: an instance of nn.Module (or classes with similar signature)
-        lossfunc: a function : (prediction outputs, correct outputs) -> loss
-        optimizer: an instance of torch.optim.Optimizer
-        num_epoch: an int
-        BATCH_SIZE: an int
+      self: an instance of nn.Module (or classes with similar signature)
+      features: a numpy array
+      labels: a numpy array
+      num_epoch: an int
+      BATCH_SIZE: an int
     """
     
     features_torch = torch.from_numpy(features)
