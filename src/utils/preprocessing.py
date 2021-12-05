@@ -5,6 +5,9 @@ import time
  
 
 def create_encoding_dictionaries(): 
+  """"
+  Creates protein encoding dictionaries fro hot key encoding.
+  """
   for index, letter in enumerate(UNIQUE_CHARS):
     PROTEIN_ENCODING[letter] = [0 for _ in range(len(UNIQUE_CHARS))]
     PROTEIN_ENCODING[letter][index] = 1
@@ -14,6 +17,9 @@ def create_encoding_dictionaries():
     
 
 def split_raw_data_file():
+  """
+  Splits the raw data file and saves true and false combinations of sequences in separate files.
+  """
   
   fasta_sequences = SeqIO.parse(open(raw_data_file_path),'fasta')
   
@@ -42,6 +48,9 @@ def split_raw_data_file():
   
 
 def create_train_test_data(false_per_true):
+  """
+  Saves all true data and a random sample of the false data to a file for training and testing.
+  """
   
   true_amount = num_of_sequences
   false_amount = num_of_sequences*false_per_true
@@ -53,6 +62,9 @@ def create_train_test_data(false_per_true):
 
 
 def preprocessing(force_save_seq = False, false_per_true = 1):
+  """
+  From raw data file to file with random train/test data in random order.
+  """
   if (len(BINARY_ENCODING) == 0) or (len(PROTEIN_ENCODING) == 0):  
     # Create dictionaries for encoding proteins
     create_encoding_dictionaries()

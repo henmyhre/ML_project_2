@@ -4,7 +4,7 @@ from src.utils.training import create_model, train_model
 
 
 def main(): 
-  preprocessing(force_save_seq = True)
+  preprocessing(force_save_seq = True, false_per_true = 1)
   model = create_model()
   train_model(model)
 
