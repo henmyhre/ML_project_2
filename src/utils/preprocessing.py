@@ -2,6 +2,9 @@ from Bio import SeqIO
 from src.CONSTS import * 
 from src.utils.utils import *
 import time
+import pandas as pd
+
+from src.utils.training import add_binary_sequences, seq_into_binary
  
 
 def create_encoding_dictionaries(): 
@@ -52,14 +55,29 @@ def create_train_test_data(false_per_true):
   Saves all true data and a random sample of the false data to a file for training and testing.
   """
   
-  true_amount = num_of_sequences
-  false_amount = num_of_sequences*false_per_true
+  true_amount = NUM_OF_SEQUENCES
+  false_amount = NUM_OF_SEQUENCES*false_per_true
   
-  clear_file(preprocessed_data_file_path)
+  clear_file(train_test_sample_file_path)
   
-  append_csv_rows_to_new_csv(seq_true_file_path, preprocessed_data_file_path, true_amount)
-  append_csv_rows_to_new_csv(seq_false_file_path, preprocessed_data_file_path, false_amount)
+  append_csv_rows_to_new_csv(seq_true_file_path, train_test_sample_file_path, true_amount)
+  append_csv_rows_to_new_csv(seq_false_file_path, train_test_sample_file_path, false_amount)
 
+
+def save_encoded_data(input_file, output_file):
+  df = pd.read_csv(input_file, sep=";", names = ["names", "start_seq", "end_seq", "label"])
+  new_df = pd.DataFrame(columns = DF_SEQ_COLUMNS)
+
+  for _, row in df.iterrows():
+    start_encoded = seq_into_binary(row["start_seq"])
+    end_encoded = seq_into_binary(row["end_seq"])
+    seq_encoded = add_binary_sequences(start_encoded, end_encoded)
+    new_df = new_df.append({"names": row["names"], "seq_encoded": seq_encoded, "label": row["label"]}, ignore_index = True)
+  print(new_df)
+  with open(output_file, "w+") as file:
+    new_df.to_csv(file)
+    
+    
 
 def preprocessing(force_save_seq = False, false_per_true = 1):
   """
@@ -73,17 +91,20 @@ def preprocessing(force_save_seq = False, false_per_true = 1):
     start = time.time()
     
     print(get_time_dif_str(start), "Starting saving to files")
-    split_raw_data_file()
+    #split_raw_data_file()
     print(get_time_dif_str(start), "Done saving to files true false files. Shuffling...")
     
-    shuffle_file_rows(seq_true_file_path)
-    shuffle_file_rows(seq_false_file_path)
+    #shuffle_file_rows(seq_false_file_path)
     print(get_time_dif_str(start), "Done shuffling. Saving to preprocessed data...")
     
-    create_train_test_data(false_per_true)
+    #create_train_test_data(false_per_true)
     print(get_time_dif_str(start), "Done saving finished preprocessed data. Shuffling...")
     
-    shuffle_file_rows(preprocessed_data_file_path)
-    print(get_time_dif_str(start), "Done with preprocessing.")
+    #shuffle_file_rows(train_test_sample_file_path)
+    print(get_time_dif_str(start), "Done with shuffling. Encoding...")
+    
+    save_encoded_data(train_test_sample_file_path, pereprocessed_data_file_path)
+    
+    print("Done with preprocessing!:)")
     
   else: print("Skipped saving to files.")

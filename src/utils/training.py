@@ -1,15 +1,14 @@
 import pandas as pd
 import numpy as np
 from src.CONSTS import *
-import csv
 from src.utils.neural_network import *
 import time
 
-def load_batch(path, row_index):
+def load_batch(df, row_index):
     
   batch = pd.DataFrame(columns = ["name", "first half", "second half", "label"])
   
-  reader = pd.read_csv(preprocessed_data_file_path, sep=';', chunksize=10, iterator=True)
+  reader = pd.read_csv(preprocessed_data_file_path, sep=';', chunksize=1000, iterator=True)
 
   for row in reader:
     name, start, end, label = row[0].split(';')
@@ -59,8 +58,29 @@ def train_model(model):
   batch_size = 500
   start = time.time()
   
-  #for batch in pd.read_csv(preprocessed_data_file_path, chunksize = batch_size):
-    
+  df = pd.read_csv(preprocessed_data_file_path, sep=';') #TODO: maybe add iterator
+  
+  batches = []
+  batch = []
+  
+  for row in df:
+    if (row.index // 1000 == 0): 
+      batches.append(batch)
+      batch = []
+      
+    names, start, end, label = row[0].split(';')
+    start_encoded = seq_into_binary(start)
+    end_encoded = seq_into_binary(end)
+
+    batch.append({"names" : names, "first half":start_encoded,
+                          "second half":end_encoded, "label":label}, ignore_index=True)   
+  
+  del df
+  
+  
+  
+  
+
   """
   for i, file_index in enumerate(file_indices):
     print("Index", i, "\nFile", file_index, "\nTime taken:", int(time.time() - start), "seconds")
