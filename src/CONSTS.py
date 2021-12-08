@@ -14,4 +14,4 @@ UNIQUE_CHARS = ['V', 'W', 'H', 'G', 'T', 'Q', 'A', 'C', 'S', 'K', 'Y', 'L', 'R',
 PROTEIN_ENCODING = dict()
 BINARY_ENCODING = dict()
 
-DF_SEQ_COLUMNS = ["names", "seq_encoded" "label"]
+DF_SEQ_COLUMNS = ["names", "seq_encoded", "label"]

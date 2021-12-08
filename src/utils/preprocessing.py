@@ -104,7 +104,6 @@ def preprocessing(force_save_seq = False, false_per_true = 1):
     print(get_time_dif_str(start), "Done with shuffling. Encoding...")
     
     save_encoded_data(train_test_sample_file_path, pereprocessed_data_file_path)
-    
-    print("Done with preprocessing!:)")
+    print(get_time_dif_str(start), "Done with preprocessing!:)")
     
   else: print("Skipped saving to files.")
