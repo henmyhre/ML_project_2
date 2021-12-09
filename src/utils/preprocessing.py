@@ -3,8 +3,8 @@ from src.CONSTS import *
 from src.utils.utils import *
 import time
 import pandas as pd
-
-from src.utils.training import add_binary_sequences, seq_into_binary
+import tqdm
+import numpy as np
  
 
 def create_encoding_dictionaries(): 
@@ -64,21 +64,6 @@ def create_train_test_data(false_per_true):
   append_csv_rows_to_new_csv(seq_false_file_path, train_test_sample_file_path, false_amount)
 
 
-def save_encoded_data(input_file, output_file):
-  df = pd.read_csv(input_file, sep=";", names = ["names", "start_seq", "end_seq", "label"])
-  new_df = pd.DataFrame(columns = DF_SEQ_COLUMNS)
-
-  for _, row in df.iterrows():
-    start_encoded = seq_into_binary(row["start_seq"])
-    end_encoded = seq_into_binary(row["end_seq"])
-    seq_encoded = add_binary_sequences(start_encoded, end_encoded)
-    new_df = new_df.append({"names": row["names"], "seq_encoded": seq_encoded, "label": row["label"]}, ignore_index = True)
-  print(new_df)
-  with open(output_file, "w+") as file:
-    new_df.to_csv(file)
-    
-    
-
 def preprocessing(force_save_seq = False, false_per_true = 1):
   """
   From raw data file to file with random train/test data in random order.
@@ -101,9 +86,63 @@ def preprocessing(force_save_seq = False, false_per_true = 1):
     print(get_time_dif_str(start), "Done saving finished preprocessed data. Shuffling...")
     
     #shuffle_file_rows(train_test_sample_file_path)
-    print(get_time_dif_str(start), "Done with shuffling. Encoding...")
+    print(get_time_dif_str(start), "Done with shuffling. \n Done with preprocessing!:)")
     
-    save_encoded_data(train_test_sample_file_path, pereprocessed_data_file_path)
-    print(get_time_dif_str(start), "Done with preprocessing!:)")
-    
+    #df = save_encoded_data(train_test_sample_file_path, preprocessed_data_file_path)
+    #print(get_time_dif_str(start), "Done with preprocessing!:)")
   else: print("Skipped saving to files.")
+
+  
+  
+"""Probably wont use this""" 
+  
+
+# =============================================================================
+# def seq_into_binary(sequence):
+#   encoded = list()
+#   for letter in sequence:
+#     encoded.append(PROTEIN_ENCODING[letter])
+#   
+#   return np.array(encoded)
+# 
+# 
+# def add_binary_sequences(start, end):
+#     
+#   output = list()
+#   
+#   for i in range(len(start)):
+#     for j in range(len(end)):
+#       output.append(start[i] + end[j])
+#   
+#   return np.array(output).flatten()
+# 
+# 
+# def save_encoded_data(input_file, output_file):
+#   df = pd.read_csv(input_file, sep=";", names = ["names", "start_seq", "end_seq", "label"])
+#   list_to_save = {"names": df["names"].to_list(), "seq_encoded": list(), "label": df["label"].to_list()}
+#   df.drop("names", axis = 1)
+#   df.drop("label", axis = 1)
+#   start_seq = df["start_seq"].to_list()
+#   end_seq = df["start_seq"].to_list()
+#   del df
+#   i = 0
+#   while len(start_seq):
+#     i += 1
+#     start_encoded = seq_into_binary(start_seq[0])
+#     del start_seq[0]
+#     end_encoded = seq_into_binary(end_seq[0])
+#     del end_seq[0]
+#     list_to_save["seq_encoded"].append(add_binary_sequences(start_encoded, end_encoded).tolist())
+#     
+#     if i and i % 1000 == 0:
+#         print("At row", i)
+#         
+# 
+#         
+# import json
+# with open('data/encoded.json', 'w') as fp:
+#     json.dump(list_to_save, fp)
+# 
+# 
+# =============================================================================
+

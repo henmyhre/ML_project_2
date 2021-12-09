@@ -5,7 +5,7 @@ seq_true_file_path = "data/sequences_true.csv"
 seq_false_file_path = "data/sequences_false.csv"
 
 train_test_sample_file_path = "data/train_test_data.csv"
-pereprocessed_data_file_path = "data/encoded.csv"
+preprocessed_data_file_path = "data/encoded.csv"
 
 NUM_OF_SEQUENCES = 5353
 

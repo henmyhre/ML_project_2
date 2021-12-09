@@ -6,10 +6,11 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 
 class MLP(nn.Module):
-  def __init__(self, hidden_size, lossfunc):
+  
+  def __init__(self, input_size, hidden_size, lossfunc):
     super(MLP, self).__init__()
 
-    self.linear_1 = nn.Linear(1, hidden_size)
+    self.linear_1 = nn.Linear(input_size, hidden_size)
     self.linear_2 = nn.Linear(hidden_size, hidden_size)
     self.linear_3 = nn.Linear(hidden_size, 1)
 
@@ -23,7 +24,7 @@ class MLP(nn.Module):
     x2 = torch.sigmoid(self.linear_2(x1))
     return self.linear_3(x2)
     
-  def train(self, features, labels, num_epoch, BATCH_SIZE):
+  def train(self, features, labels, epoch):
     
     """
     Train a model for num_epoch epochs on the given data
@@ -32,26 +33,17 @@ class MLP(nn.Module):
       self: an instance of nn.Module (or classes with similar signature)
       features: a numpy array
       labels: a numpy array
-      num_epoch: an int
-      BATCH_SIZE: an int
     """
-    
-    features_torch = torch.from_numpy(features)
-    labels_torch = torch.from_numpy(labels)
-    dataset = torch.utils.data.TensorDataset(features_torch, labels_torch)
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
-    
-    for epoch in range(num_epoch):
-      
-      for id_batch, (x_batch, y_batch) in enumerate(dataloader):
-        
-        pred = self.forward(x_batch)
-        loss = self.lossfunc(pred, y_batch)
+    features_torch = torch.from_numpy(features).float()
+    labels_torch = torch.from_numpy(labels).float()
 
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
+    pred = self.forward(features_torch)
+    loss = self.lossfunc(pred, labels_torch)
+
+    self.optimizer.zero_grad()
+    loss.backward()
+    self.optimizer.step()
       
-      if epoch % 10 == 0:
-        print ('Epoch [%d/%d], Loss: %.4f' %(epoch+1, num_epoch, loss.item()))
+    if epoch % 10 == 0:
+      print ('Epoch [%d], Loss: %.4f' %(epoch+1, loss.item()))
         

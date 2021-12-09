@@ -2,81 +2,102 @@ import pandas as pd
 import numpy as np
 from src.CONSTS import *
 from src.utils.neural_network import *
+from src.utils.make_batch import create_batch
+from src.utils.utils import shuffle_file_rows
+
 import time
 
-def load_batch(df, row_index):
-    
-  batch = pd.DataFrame(columns = ["name", "first half", "second half", "label"])
+def train():
+  raw_data = load_data()
+  model = create_model(len(PROTEIN_ENCODING) * len(raw_data["start_seq"][0])**2)
+  train_model(model,raw_data)
   
-  reader = pd.read_csv(preprocessed_data_file_path, sep=';', chunksize=1000, iterator=True)
-
-  for row in reader:
-    name, start, end, label = row[0].split(';')
-    start_encoded = seq_into_binary(start)
-    end_encoded = seq_into_binary(end)
-
-    batch = batch.append({"name" : name, "first half":start_encoded,
-                          "second half":end_encoded, "label":label}, ignore_index=True)   
-  return batch
+  return model
 
 
-def seq_into_binary(sequence):
-  encoded = list()
-  for letter in sequence:
-    encoded.append(PROTEIN_ENCODING[letter])
+
+def load_data():
   
-  return np.array(encoded)
+  data = pd.read_csv(train_test_sample_file_path,
+                     names = ["name","start_seq", "end_seq", "labels"], sep=';')
+  return data
 
 
-def add_binary_sequences(start, end):
-    
-  output = list()
+def create_model(input_size, hidden_size = 10):
+  """This function creates a model"""
   
-  for i in range(len(start)):
-    for j in range(len(end)):
-      output.append(start[i] + end[j])
-  
-  return np.array(output).flatten()
-
-
-def create_batch_input(batch):
-  batch_input = list()
-  
-  for index in range(len(batch)):
-    batch_input.append(add_binary_sequences(batch["first half"][index], batch["second half"][index]))
-  
-  return np.array(batch_input) 
-
-
-def create_model():
-  model = MLP(hidden_size=2, lossfunc=nn.MSELoss())
+  model = MLP(input_size = input_size, hidden_size = hidden_size, lossfunc=nn.MSELoss())
   model.set_optimizer()
   return model
 
 
-def train_model(model):
-  batch_size = 500
+def train_model(model, raw_data, batch_size = 500, epoch = 1):
+  """This funtion trains the model. First raw data is loaded,
+  then for each batch this is translated. The model is trained 
+  on these batches. This reapeted for n epochs"""
+  
   start = time.time()
   
-  df = pd.read_csv(preprocessed_data_file_path, sep=';') #TODO: maybe add iterator
-  
-  batches = []
-  batch = []
-  
-  for row in df:
-    if (row.index // 1000 == 0): 
-      batches.append(batch)
-      batch = []
+  for k in range(epoch):
+    
+    steps = np.linspace(0, int(len(raw_data)), int(len(raw_data)/batch_size), dtype = int)
+    
+    for i in range(len(steps)-1):
+      print("Training on batch",i," ...")
+      x_batch, y_batch = create_batch(raw_data, steps[i], steps[i+1])
+      model.train(x_batch, y_batch, epoch)
+      print("One batch succesful, time taken:", time.time()-start)
+    
+    print("One epoch succesful, time taken:", time.time()-start)
       
-    names, start, end, label = row[0].split(';')
-    start_encoded = seq_into_binary(start)
-    end_encoded = seq_into_binary(end)
+    """If data is too big, replace this by:
+    shuffle_file_rows(train_test_sample_file_path)
+    raw_data = load_data()"""
+    
+    raw_data = raw_data.sample(frac=1).reset_index(drop=True)
 
-    batch.append({"names" : names, "first half":start_encoded,
-                          "second half":end_encoded, "label":label}, ignore_index=True)   
+    
   
-  del df
   
+  
+  
+# =============================================================================
+#   batch = pd.DataFrame(columns = ["name", "first half", "second half", "label"])
+#   
+#   reader = pd.read_csv(preprocessed_data_file_path, sep=';', chunksize=1000, iterator=True)
+# 
+#   for row in reader:
+#     name, start, end, label = row[0].split(';')
+#     start_encoded = seq_into_binary(start)
+#     end_encoded = seq_into_binary(end)
+# 
+#     batch = batch.append({"name" : name, "first half":start_encoded,
+#                           "second half":end_encoded, "label":label}, ignore_index=True)   
+# =============================================================================  
+  
+  
+  
+  
+# =============================================================================
+    # df = pd.read_csv(preprocessed_data_file_path, sep=';') #TODO: maybe add iterator
+#   batches = []
+#   batch = []
+#   
+#   for row in df:
+#     if (row.index // 1000 == 0): 
+#       batches.append(batch)
+#       batch = []
+#       
+#     names, start, end, label = row[0].split(';')
+#     start_encoded = seq_into_binary(start)
+#     end_encoded = seq_into_binary(end)
+# 
+#     batch.append({"names" : names, "first half":start_encoded,
+#                           "second half":end_encoded, "label":label}, ignore_index=True)   
+#   
+#   del df
+#   
+# =============================================================================
   
   
   
