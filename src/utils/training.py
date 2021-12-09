@@ -23,7 +23,7 @@ def load_data():
   return data
 
 
-def create_model(input_size, hidden_size = 10):
+def create_model(input_size, hidden_size = 100):
   """This function creates a model"""
   
   model = MLP(input_size = input_size, hidden_size = hidden_size, lossfunc=nn.MSELoss())
@@ -31,7 +31,7 @@ def create_model(input_size, hidden_size = 10):
   return model
 
 
-def train_model(model, raw_data, batch_size = 500, epoch = 1):
+def train_model(model, raw_data, batch_size = 500, epoch = 5):
   """This funtion trains the model. First raw data is loaded,
   then for each batch this is translated. The model is trained 
   on these batches. This reapeted for n epochs"""
@@ -42,14 +42,22 @@ def train_model(model, raw_data, batch_size = 500, epoch = 1):
     
     steps = np.linspace(0, int(len(raw_data)), int(len(raw_data)/batch_size), dtype = int)
     
-    for i in range(len(steps)-1):
+    # Train
+    for i in range(len(steps)-2): # Last batch kept for performace evaluation
       print("Training on batch",i," ...")
       x_batch, y_batch = create_batch(raw_data, steps[i], steps[i+1])
-      model.train(x_batch, y_batch, epoch)
-      print("One batch succesful, time taken:", time.time()-start)
+      model.train(x_batch, y_batch, k)
     
-    print("One epoch succesful, time taken:", time.time()-start)
-      
+    # Get performance
+    x_batch, y_batch = create_batch(raw_data, steps[i], steps[i+1])
+    model.get_performance(x_batch, y_batch) 
+    
+    print("Epoch ",i," finished, total time taken:", time.time()-start)
+    accuracy = model.performance[-1]["Accuracy"]
+    F1score = model.performance[-1]["F1_score"]
+    print("Accuracy is: %.4f and F1-score is: %.4f" %(accuracy, F1score))
+     
+    
     """If data is too big, replace this by:
     shuffle_file_rows(train_test_sample_file_path)
     raw_data = load_data()"""

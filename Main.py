@@ -6,4 +6,6 @@ from src.utils.training import train
 def main(): 
   preprocessing(force_save_seq = True, false_per_true = 1)
   model = train()  
-main()
+  return model
+
+model = main()

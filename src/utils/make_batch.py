@@ -11,7 +11,7 @@ import numpy as np
 from src.CONSTS import *
 
 
-def create_batch(df, start_index, end_index):
+def create_batch(df, start_index, end_index, cross_correlate = True):
   """This function creates a batch of a given size, translates the
   aminoacid sequence into a one-hot encoded sequence and adds the 
   two sequences together
@@ -25,13 +25,23 @@ def create_batch(df, start_index, end_index):
   
     
   batchsize = end_index - start_index  
-  input_data = np.empty((batchsize, len(PROTEIN_ENCODING) * len(df["start_seq"][0])**2))
-  labels = df["labels"].to_numpy()
   
-  for i in range(start_index, start_index + batchsize):
-    index = i % batchsize
-    input_data[index,:] = add_binary_sequences(seq_into_binary(df["start_seq"][i]),
-                                           seq_into_binary(df["end_seq"][i]))
+  labels = df["labels"].to_numpy()[start_index : end_index]
+  
+  if cross_correlate:
+    input_data = np.empty((batchsize, len(PROTEIN_ENCODING) * len(df["start_seq"][0])**2))
+    for i in range(start_index, start_index + batchsize):
+      index = i % batchsize
+      input_data[index,:] = add_binary_sequences(seq_into_binary(df["start_seq"][i]),
+                                             seq_into_binary(df["end_seq"][i]))
+      
+  
+  else:
+    input_data = np.empty((batchsize, len(df["start_seq"][0])*2))
+    for i in range(start_index, start_index + batchsize):
+      index = i % batchsize
+      input_data[index,:len(df["start_seq"][0])] = df["start_seq"][i]
+      input_data[index,len(df["start_seq"][0]):] = df["end_seq"][i]
     
   return input_data, labels
   
