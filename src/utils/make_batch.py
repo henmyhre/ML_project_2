@@ -9,7 +9,8 @@ from src.CONSTS import *
 import pandas as pd
 import numpy as np
 from src.CONSTS import *
-
+import umap
+import time
 
 def create_batch(df, start_index, end_index, cross_correlate = True):
   """This function creates a batch of a given size, translates the
@@ -29,12 +30,18 @@ def create_batch(df, start_index, end_index, cross_correlate = True):
   labels = df["labels"].to_numpy()[start_index : end_index]
   
   if cross_correlate:
-    input_data = np.empty((batchsize, len(PROTEIN_ENCODING) * len(df["start_seq"][0])**2))
-    for i in range(start_index, start_index + batchsize):
-      index = i % batchsize
-      input_data[index,:] = add_binary_sequences(seq_into_binary(df["start_seq"][i]),
-                                             seq_into_binary(df["end_seq"][i]))
-      
+      input_data = np.empty((batchsize, len(PROTEIN_ENCODING) * len(df["start_seq"][0])**2))
+      start = time.time()
+      for i in range(start_index, start_index + batchsize):
+          index = i % batchsize
+          input_data[index,:] = add_binary_sequences(seq_into_binary(df["start_seq"][i]),
+                                                 seq_into_binary(df["end_seq"][i]))
+      print("Adding sequences took",time.time()-start, " seconds")
+     
+      # Reduce dimensionality to 20
+      start = time.time()
+      input_data = reduce_dimensionality(input_data)
+      print("reducing took", time.time()-start,' seconds')
   
   else:
     input_data = np.empty((batchsize, len(df["start_seq"][0])*2))
@@ -54,7 +61,6 @@ def seq_into_binary(sequence):
   encoded = list()
   for letter in sequence:
     encoded.append(PROTEIN_ENCODING[letter])
-  
   return np.array(encoded)
 
 
@@ -72,3 +78,11 @@ def add_binary_sequences(start, end):
       output.append(start[i] + end[j])
   
   return np.array(output).flatten()
+
+def reduce_dimensionality(sparsematrix):
+    """This function reduces the dimension of the sparsematrix"""
+    mapper = umap.UMAP(n_components=5353, random_state=42, low_memory=False)
+    return mapper.fit_transform(sparsematrix)
+  
+  
+  

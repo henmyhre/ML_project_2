@@ -12,17 +12,15 @@ class MLP(nn.Module):
 
     self.linear_1 = nn.Linear(input_size, hidden_size)
     self.linear_2 = nn.Linear(hidden_size, hidden_size)
-    self.linear_3 = nn.Linear(hidden_size, 1)
     self.lossfunc = lossfunc
     self.performance = []
 
   def set_optimizer(self):
-    self.optimizer=torch.optim.SGD(self.parameters(), lr=1e-3)
+    self.optimizer=torch.optim.Adam(self.parameters(), lr=1e-3)
     
   def forward(self, x):
-    x1 = torch.sigmoid(self.linear_1(x))
-    x2 = torch.sigmoid(self.linear_2(x1))
-    return self.linear_3(x2)
+    x1 = F.leaky_relu(self.linear_1(x))
+    return F.sigmoid(self.linear_2(x1))
     
   def get_performance(self, features, labels):
     
@@ -30,9 +28,9 @@ class MLP(nn.Module):
     labels_torch = torch.from_numpy(labels).float()
     pred = self.forward(features_torch)
     
-    prediction = pred > 0.5
+    prediction = pred > 0
     prediction = torch.reshape(prediction, labels.shape)
-    labels = labels_torch > 0.5
+    labels = labels_torch > 0
 
     TP = torch.sum(torch.logical_and(labels, prediction)).float()
     FP = torch.sum(torch.logical_and(torch.logical_not(labels), prediction)).float()
@@ -41,6 +39,7 @@ class MLP(nn.Module):
     print(TP, FP, TN, FN)
     self.performance.append({"Accuracy": (TP+TN)/(TP+TN+FP+FN),
                              "F1_score": (TP/(TP+FP)*TP/(TP+FN))})
+    
   
   
   def train(self, features, labels, epoch):
@@ -66,5 +65,5 @@ class MLP(nn.Module):
     prediction = torch.reshape(prediction, labels.shape)
     labels = labels_torch > 0.5
 
-    print ('Epoch [%d], Loss: %.4f' %(epoch, loss.item()))
+    print ('Epoch %d, Loss: %.4f' %(epoch, loss.item()))
         
