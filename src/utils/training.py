@@ -5,7 +5,7 @@ from src.utils.neural_network import *
 from src.utils.make_batch import *
 from src.utils.utils import shuffle_file_rows
 from torch.utils.data import DataLoader
-
+import torch
 import time
 
 def train():
@@ -53,7 +53,7 @@ def build_indices_batches(y, interval, seed):
     np.random.seed(seed)
     indices = np.random.permutation(num_row)
     k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
-    return np.array(k_indices)
+    return torch.tensor(k_indices)
   
 
 def create_model(input_size, hidden_size = 100):
@@ -72,17 +72,16 @@ def train_model(model, X, labels, batch_size = 500, epoch = 10):
   
   for k in range(epoch):
     indices = build_indices_batches(labels, batch_size, seed = 2)
-    
     # Train
     for i in range(len(indices)-1): # Last batch kept for performace evaluation
-      x_batch = X[indices[i]]
-      y_batch = labels[indices[i]]
+      x_batch = X.index_select(0, indices[i]).to_dense()  # Get dense representation
+      y_batch = labels.index_select(0, indices[i])
       print("Training on batch ",i,"...")
       model.train(x_batch, y_batch, k)
     
     # Get performance
-    x_batch = X[indices[-1]]
-    y_batch = labels[indices[-1]]
+    x_batch = X.index_select(0, indices[-1]).to_dense()
+    y_batch = labels.index_select(0, indices[-1])
     model.get_performance(x_batch, y_batch) 
     
     print("Epoch ",i," finished, total time taken:", time.time()-start)
