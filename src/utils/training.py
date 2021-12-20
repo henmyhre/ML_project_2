@@ -22,6 +22,12 @@ def load_data():
                      names = ["name","start_seq", "end_seq", "labels"], sep=';')
   return data
 
+def transform_raw_data(data):
+  
+  steps = np.linspace(0, int(len(raw_data)), int(len(raw_data)/batch_size), dtype = int)
+  for i in range(len(steps)-1): 
+      x_batch, y_batch = create_batch(raw_data, steps[i], steps[i+1])
+  
 
 def create_model(input_size, hidden_size = 100):
   """This function creates a model"""
