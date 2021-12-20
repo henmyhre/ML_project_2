@@ -23,8 +23,9 @@ def create_sparse_matrix_pytorch(df, cross_correlate = True):
   """
   print("Creating sparse matrix...")
   # TODO: add matrices while hot encoded or mutliply after dimension reduction?
-  lil_matrix_rows = []
-  lil_matrix_data = []
+  coo_matrix_rows = []
+  coo_matrix_cols = []
+  coo_matrix_data = []
   for index, row in tqdm(df.iterrows(), total=df.shape[0]):
     if cross_correlate:
       one_hot = add_binary_sequences(seq_into_binary(row["start_seq"]),
@@ -36,14 +37,15 @@ def create_sparse_matrix_pytorch(df, cross_correlate = True):
       
     # Find Nonzero indices
     non_zero= np.flatnonzero(one_hot)
-    lil_matrix_rows.append(non_zero.tolist())
+    coo_matrix_cols.extend(non_zero.tolist())
+    coo_matrix_rows.extend([index] * len(non_zero))
     # Non zero values 
-    lil_matrix_data.append(one_hot[non_zero].tolist())
+    coo_matrix_data.extend(one_hot[non_zero].tolist())
   
+  # indices sparse matrix
+  indices = [coo_matrix_rows, coo_matrix_cols]
   # Create sparseamatrix
-  factor_matrix = torch.sparse.FloatTensor(lil_matrix_rows, 
-                                           lil_matrix_data,
-                                           (len(lil_matrix_rows), len(one_hot)))
+  factor_matrix = torch.sparse_coo_tensor(indices, coo_matrix_data)
 
   return factor_matrix
 
@@ -109,8 +111,13 @@ def add_binary_sequences(start, end):
 
 def reduce_dimensionality(sparsematrix):
     """This function reduces the dimension of the sparsematrix"""
-    mapper = umap.UMAP(n_components=5353, random_state=42, low_memory=False, verbose=True)
-    return mapper.fit_transform(sparsematrix)
+    # Fit reduce model on 10% of data
+    size = int(list(sparsematrix.shape)[0]*0.1)
+    fit_data = tsparsematrix[:size, :]
+    mapper = umap.UMAP(n_components=5353, random_state=42, low_memory=False, verbose=True).fit(fit_data)
+    return mapper.transform(sparsematrix)
+  
+  
   
   
   
