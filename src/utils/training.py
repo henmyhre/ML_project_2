@@ -3,8 +3,6 @@ import numpy as np
 from src.CONSTS import *
 from src.utils.neural_network import *
 from src.utils.make_batch import *
-from src.utils.utils import shuffle_file_rows
-from torch.utils.data import DataLoader
 import torch
 import time
 
@@ -72,8 +70,12 @@ def train_model(model, X, labels, batch_size = 2, epoch = 10):
   
   start = time.time()
   
+<<<<<<< HEAD
   for k in range(epoch):
     # Different indices for test and training every round, "shuffles" the data
+=======
+  for k in tqdm(range(epoch)):
+>>>>>>> 254fdf13472d70da9936025c8d606721bb568909
     indices = build_indices_batches(labels, batch_size, seed = 2)
     # Train
     for i in range(indices.size()[1] - 1): # Last batch kept for performace evaluation
