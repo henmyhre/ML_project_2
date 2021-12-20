@@ -76,16 +76,16 @@ def preprocessing(force_save_seq = False, false_per_true = 1):
     start = time.time()
     
     print(get_time_dif_str(start), "Starting saving to files")
-    #split_raw_data_file()
+    split_raw_data_file()
     print(get_time_dif_str(start), "Done saving to files true false files. Shuffling...")
     
-    #shuffle_file_rows(seq_false_file_path)
+    shuffle_file_rows(seq_false_file_path)
     print(get_time_dif_str(start), "Done shuffling. Saving to preprocessed data...")
     
-    #create_train_test_data(false_per_true)
+    create_train_test_data(false_per_true)
     print(get_time_dif_str(start), "Done saving finished preprocessed data. Shuffling...")
     
-    #shuffle_file_rows(train_test_sample_file_path)
+    shuffle_file_rows(train_test_sample_file_path)
     print(get_time_dif_str(start), "Done with shuffling. \n Done with preprocessing!:)")
     
     #df = save_encoded_data(train_test_sample_file_path, preprocessed_data_file_path)

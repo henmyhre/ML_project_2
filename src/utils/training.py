@@ -18,9 +18,7 @@ def train():
   return model
 
 
-
 def load_data():
-  
   data = pd.read_csv(train_test_sample_file_path,
                      names = ["name","start_seq", "end_seq", "labels"], sep=';')
   return data
