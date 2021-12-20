@@ -24,8 +24,8 @@ class MLP(nn.Module):
     
   def get_performance(self, features, labels):
     
-    features_torch = torch.from_numpy(features).float()
-    labels_torch = torch.from_numpy(labels).float()
+    features_torch = features.float()
+    labels_torch = labels.float()
     pred = self.forward(features_torch)
     
     prediction = pred > 0
@@ -49,11 +49,11 @@ class MLP(nn.Module):
     
     Inputs:
       self: an instance of nn.Module (or classes with similar signature)
-      features: a numpy array
-      labels: a numpy array
+      features: pytorch tensor
+      labels: pytorch tensor
     """
-    features_torch = torch.from_numpy(features).float()
-    labels_torch = torch.from_numpy(labels).float()
+    features_torch = features.float()
+    labels_torch = labels.float()
     
     pred = self.forward(features_torch)
     loss = self.lossfunc(pred, labels_torch)
