@@ -113,7 +113,7 @@ def reduce_dimensionality(sparsematrix):
     """This function reduces the dimension of the sparsematrix"""
     # Fit reduce model on 10% of data
     size = int(list(sparsematrix.shape)[0]*0.1)
-    fit_data = tsparsematrix[:size, :]
+    fit_data = sparsematrix[:size, :]
     mapper = umap.UMAP(n_components=5353, random_state=42, low_memory=False, verbose=True).fit(fit_data)
     return mapper.transform(sparsematrix)
   
