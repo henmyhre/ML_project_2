@@ -11,7 +11,7 @@ class MLP(nn.Module):
     super(MLP, self).__init__()
 
     self.linear_1 = nn.Linear(input_size, hidden_size)
-    self.linear_2 = nn.Linear(hidden_size, hidden_size)
+    self.linear_2 = nn.Linear(hidden_size, 1)
     self.lossfunc = lossfunc
     self.performance = []
 
@@ -20,7 +20,7 @@ class MLP(nn.Module):
     
   def forward(self, x):
     x1 = F.leaky_relu(self.linear_1(x))
-    return F.sigmoid(self.linear_2(x1))
+    return torch.sigmoid(self.linear_2(x1))
     
   def get_performance(self, features, labels):
     

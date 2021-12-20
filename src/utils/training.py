@@ -10,9 +10,13 @@ import time
 
 def train():
   raw_data = load_data()
+  raw_data= raw_data.iloc[:100]
+  # Create sparse matrix
   input_data = transform_raw_data(raw_data)
   labels = get_labels(raw_data)
-  model = create_model(NUM_OF_SEQUENCES)
+  # Create model, input size is size of feature lenght
+  model = create_model(input_data.size()[1])
+  # Train model
   train_model(model,input_data, labels)
   
   return model
@@ -51,7 +55,7 @@ def build_indices_batches(y, interval, seed):
     np.random.seed(seed)
     indices = np.random.permutation(num_row)
     k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
-    return torch.tensor(k_indices)
+    return torch.tensor(k_indices).long()
   
 
 def create_model(input_size, hidden_size = 100):
@@ -61,7 +65,7 @@ def create_model(input_size, hidden_size = 100):
   return model
 
 
-def train_model(model, X, labels, batch_size = 500, epoch = 10):
+def train_model(model, X, labels, batch_size = 2, epoch = 10):
   """This funtion trains the model. First raw data is loaded,
   then for each batch this is translated. The model is trained 
   on these batches. This reapeted for n epochs"""
@@ -69,17 +73,19 @@ def train_model(model, X, labels, batch_size = 500, epoch = 10):
   start = time.time()
   
   for k in range(epoch):
+    # Different indices for test and training every round, "shuffles" the data
     indices = build_indices_batches(labels, batch_size, seed = 2)
     # Train
-    for i in range(len(indices)-1): # Last batch kept for performace evaluation
-      x_batch = X.index_select(0, indices[i]).to_dense()  # Get dense representation
-      y_batch = labels.index_select(0, indices[i])
+    for i in range(indices.size()[1] - 1): # Last batch kept for performace evaluation
+      x_batch = X.index_select(0, indices[:, i]).to_dense()  # Get dense representation
+      y_batch = labels.index_select(0, indices[:, i])
+      print(x_batch.size(), y_batch.size())
       print("Training on batch ",i,"...")
       model.train(x_batch, y_batch, k)
     
     # Get performance
-    x_batch = X.index_select(0, indices[-1]).to_dense()
-    y_batch = labels.index_select(0, indices[-1])
+    x_batch = X.index_select(0, indices[:, -1]).to_dense()
+    y_batch = labels.index_select(0, indices[:, -1])
     model.get_performance(x_batch, y_batch) 
     
     print("Epoch ",i," finished, total time taken:", time.time()-start)
@@ -92,6 +98,5 @@ def train_model(model, X, labels, batch_size = 500, epoch = 10):
     shuffle_file_rows(train_test_sample_file_path)
     raw_data = load_data()"""
     
-    raw_data = raw_data.sample(frac=1).reset_index(drop=True)
 
     
