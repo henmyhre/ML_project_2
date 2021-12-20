@@ -19,7 +19,11 @@ def create_sparse_matrix_pytorch(df, cross_correlate = True):
   coo_matrix_rows = []
   coo_matrix_cols = []
   coo_matrix_data = []
-  for index, row in tqdm(df.iterrows(), total=df.shape[0]):
+  index = 0
+  while not df.empty:   
+    row = df.iloc[-1]     #Delete last row when it gets read out
+    df = df.iloc[:-1]
+ # for index, row in tqdm(df.iterrows(), total=df.shape[0]):
     if cross_correlate:
       one_hot = add_binary_sequences(seq_into_binary(row["start_seq"]),
                                      seq_into_binary(row["end_seq"]))
@@ -27,19 +31,21 @@ def create_sparse_matrix_pytorch(df, cross_correlate = True):
       one_hot = np.empty((1, row["end_seq"]*2))
       one_hot[0,:len(row["start_seq"])] = row["start_seq"]
       one_hot[0,len(row["end_seq"]):] = row["end_seq"]
-      
+    
     # Find Nonzero indices
     non_zero= np.flatnonzero(one_hot)
+    # save row and col coordinates
     coo_matrix_cols.extend(non_zero.tolist())
     coo_matrix_rows.extend([index] * len(non_zero))
     # Non zero values 
     coo_matrix_data.extend(one_hot[non_zero].tolist())
-  
-  # indices sparse matrix
-  indices = [coo_matrix_rows, coo_matrix_cols]
+    # Increase index
+    index +=1
+    if index % 1000 == 0:
+        print("At index", index)
+  print("Putting into sparse...")
   # Create sparseamatrix
-  factor_matrix = torch.sparse_coo_tensor(indices, coo_matrix_data)
-
+  factor_matrix = torch.sparse_coo_tensor([coo_matrix_rows, coo_matrix_cols], coo_matrix_data)
   return factor_matrix
 
   

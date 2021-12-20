@@ -8,15 +8,22 @@ import time
 
 def train():
   raw_data = load_data()
-  raw_data= raw_data.iloc[:100]
+  raw_data= raw_data.iloc[:500]
   # Create sparse matrix
   input_data = transform_raw_data(raw_data)
   labels = get_labels(raw_data)
+  print(labels)
   # Create model, input size is size of feature lenght
   model = create_model(input_data.size()[1])
   # Train model
   train_model(model,input_data, labels)
   
+  return model
+
+def create_model(input_size, hidden_size = 100):
+  """This function creates a model""" 
+  model = MLP(input_size = input_size, hidden_size = hidden_size, lossfunc=nn.BCELoss())
+  model.set_optimizer()
   return model
 
 
@@ -27,7 +34,8 @@ def load_data():
 
 def get_labels(df):
     """This function gets the labels defined in data[labels] and return as tensor"""
-    labels = df["labels"].replace(0, -1)
+    labels = df["labels"].replace(-1, 0)
+    print(labels.values)
     return torch.tensor(labels.values)
   
 
@@ -46,48 +54,38 @@ def transform_raw_data(data, reduce=False):
         return sparse
 
 
-def build_indices_batches(y, interval, seed):
+def build_indices_batches(y, interval, seed=None):
     """build k indices for k-fold."""
     num_row = y.shape[0]
     k_fold = int(num_row / interval)
-    np.random.seed(seed)
+    #np.random.seed(seed)
     indices = np.random.permutation(num_row)
     k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
     return torch.tensor(k_indices).long()
   
 
-def create_model(input_size, hidden_size = 100):
-  """This function creates a model""" 
-  model = MLP(input_size = input_size, hidden_size = hidden_size, lossfunc=nn.HingeEmbeddingLoss())
-  model.set_optimizer()
-  return model
 
-
-def train_model(model, X, labels, batch_size = 2, epoch = 10):
+def train_model(model, X, labels, batch_size = 100, epoch = 10):
   """This funtion trains the model. First raw data is loaded,
   then for each batch this is translated. The model is trained 
   on these batches. This reapeted for n epochs"""
   
   start = time.time()
-  
-<<<<<<< HEAD
-  for k in range(epoch):
-    # Different indices for test and training every round, "shuffles" the data
-=======
+    
   for k in tqdm(range(epoch)):
->>>>>>> 254fdf13472d70da9936025c8d606721bb568909
+    # Different indices for test and training every round, "shuffles" the data
     indices = build_indices_batches(labels, batch_size, seed = 2)
     # Train
-    for i in range(indices.size()[1] - 1): # Last batch kept for performace evaluation
-      x_batch = X.index_select(0, indices[:, i]).to_dense()  # Get dense representation
-      y_batch = labels.index_select(0, indices[:, i])
-      print(x_batch.size(), y_batch.size())
+    for i in range(indices.size()[0] - 1): # Last batch kept for performace evaluation
+      x_batch = X.index_select(0, indices[i,:]).to_dense()  # Get dense representation
+      y_batch = labels.index_select(0, indices[i,:])
       print("Training on batch ",i,"...")
       model.train(x_batch, y_batch, k)
     
+    
     # Get performance
-    x_batch = X.index_select(0, indices[:, -1]).to_dense()
-    y_batch = labels.index_select(0, indices[:, -1])
+    x_batch = X.index_select(0, indices[-1,:]).to_dense()
+    y_batch = labels.index_select(0, indices[-1,:])
     model.get_performance(x_batch, y_batch) 
     
     print("Epoch ",i," finished, total time taken:", time.time()-start)

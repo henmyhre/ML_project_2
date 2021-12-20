@@ -17,6 +17,7 @@ class MLP(nn.Module):
 
   def set_optimizer(self):
     self.optimizer=torch.optim.Adam(self.parameters(), lr=1e-3)
+    #self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
     
   def forward(self, x):
     x1 = F.leaky_relu(self.linear_1(x))
@@ -54,8 +55,12 @@ class MLP(nn.Module):
     """
     features_torch = features.float()
     labels_torch = labels.float()
-    
+    # Forward propagate
     pred = self.forward(features_torch)
+    # Make sure pred is same size as labels_torch
+    pred = pred.reshape(labels_torch.size())
+    
+    # Get loss and backpropagate
     loss = self.lossfunc(pred, labels_torch)
     self.optimizer.zero_grad()
     loss.backward()
