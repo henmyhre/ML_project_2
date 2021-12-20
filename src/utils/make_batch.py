@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Dec  9 08:22:05 2021
-
-@author: jurri
-"""
-from Bio import SeqIO
 from src.CONSTS import * 
 import pandas as pd
 import numpy as np
