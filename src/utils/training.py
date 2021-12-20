@@ -12,7 +12,7 @@ def train():
   raw_data = load_data()
   input_data = transform_raw_data(raw_data)
   labels = get_labels(raw_data)
-  model = create_model(5353)
+  model = create_model(NUM_OF_SEQUENCES)
   train_model(model,input_data, labels)
   
   return model
@@ -25,7 +25,7 @@ def load_data():
                      names = ["name","start_seq", "end_seq", "labels"], sep=';')
   return data
 
-def get_labels(data):
+def get_labels(df):
     """This function gets the labels defined in data[labels] and return as tensor"""
     labels = df["labels"].replace(0, -1)
     return torch.tensor(labels.values)
