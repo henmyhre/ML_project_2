@@ -13,4 +13,4 @@ class BinaryClassfier(nn.Module):
         
     def forward(self, x):
         x1 = F.leaky_relu(self.linear_1(x))
-        return torch.sigmoid(self.linear_2(x1))
+        return self.linear_2(x1)
