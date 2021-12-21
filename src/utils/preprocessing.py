@@ -5,6 +5,7 @@ import time
 import pandas as pd
 import tqdm
 import numpy as np
+import torch
  
 
 def create_encoding_dictionaries(): 
@@ -57,7 +58,32 @@ def create_sparse_matrix_pytorch(df, cross_correlate = True):
     # Create sparseamatrix
     factor_matrix = torch.sparse_coo_tensor([coo_matrix_rows, coo_matrix_cols], coo_matrix_data)
     return factor_matrix
-  
+
+def seq_into_binary(sequence):
+    """This function translates an aminoacid sequence into a one-hot encoded sequence
+    param:  sequence: list
+    return: encoded: ndarray"""
+
+    encoded = list()
+    for letter in sequence:
+        encoded.append(PROTEIN_ENCODING[letter])
+    return np.array(encoded)
+
+
+def add_binary_sequences(start, end):
+    """This function adds hot encoded aminoacid positions together for each position in the sequence
+    
+    param:  start:  ndarray
+            end:   ndarray
+    return: output: ndarray"""
+    
+    output = list()
+    
+    for i in range(len(start)):
+        for j in range(len(end)):
+            output.append(start[i] + end[j])
+    
+    return np.array(output).flatten()  
     
 
 def split_raw_data_file():

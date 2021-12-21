@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from src.CONSTS import *
 from src.utils.classifier import *
-from src.utils.make_batch import *
+from src.utils.preprocessing import *
 import torch
 import time
 import tqdm
