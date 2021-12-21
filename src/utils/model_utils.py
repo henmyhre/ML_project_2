@@ -4,6 +4,32 @@ import numpy as np
 from src.CONSTS import PROTEIN_ENCODING
 from sklearn.decomposition import IncrementalPCA
 
+
+
+def transform_data(df, compare = True):
+    """
+    This function transforms the raw data into input data for the learning algorithm
+    and into the corrseponding labels.
+    param: df: pd.DataFrame
+    
+    return: torch.tensor
+            torch.tensor
+    """
+    
+    begin, end, labels = create_one_hot_encoded(df)
+    
+    if compare:
+        begin_reduced = pca_transform(begin, n = 400)
+        end_reduced = pca_transform(end, n = 400)
+        # Compare by mulitplication  
+        return torch.tensor(begin_reduced*end_reduced), torch.tensor(labels)
+      
+    else:
+        begin_end = np.concatenate((begin, end))
+        begin_end_reduced = pca_transform(begin_end, n = 400)
+        return torch.tensor(begin_end_reduced), torch.tensor(labels)
+      
+      
  
 def seq_into_binary(sequence):
     """
@@ -18,7 +44,17 @@ def seq_into_binary(sequence):
     return np.array(encoded)  
 
 
+
 def create_one_hot_encoded(df):
+    """
+    This function "translates" the amino acid sequences into one hot encoded sequences.
+    param: df: pd.DataFrame, contains startand end sequence in columns start_seq and end_seq
+    
+    return: begin_one_hot: ndarray
+            end_one_hot: ndarray
+            labels: list
+    """
+    
     begin_one_hot = np.empty((len(df), len(PROTEIN_ENCODING)*len(df["start_seq"][0])))
     end_one_hot = np.empty((len(df), len(PROTEIN_ENCODING)*len(df["end_seq"][0])))
     
@@ -39,20 +75,18 @@ def create_one_hot_encoded(df):
 
 
 def pca_transform(data, n = 300):
+    """
+    This functions does pca on the input data. PCA finds n principle components.
+    param: data: ndarray
+           n: int
+    return: ndarray
+    """
+  
     pca = IncrementalPCA(n_components = n, batch_size=500)
     pca.fit(data)
     print("Variance explained:",pca.explained_variance_ratio_.sum())
     
     return pca.transform(data)
-
-
-def transform_data(df):
-    
-    begin, end, labels = create_one_hot_encoded(df)
-    begin_reduced = pca_transform(begin, n = 400)
-    end_reduced= pca_transform(end, n = 400)
-    # Compare by mulitplication
-    return torch.tensor(begin_reduced*end_reduced), torch.tensor(labels)
     
 
 def get_performance(y_true, y_pred):

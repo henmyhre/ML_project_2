@@ -46,7 +46,6 @@ def train(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfunc=nn.
         
         # Train
         for i in range(indices.size()[0]): # Last batch kept for performace evaluation
-            print("Training on batch ",i,"...")
             x_batch = X[indices[i,:]].float()
             y_batch = labels[indices[i,:]].float()
             #x_batch = X.index_select(0, indices[i,:]).to_dense().float()  # Get dense representation
@@ -60,7 +59,6 @@ def train(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfunc=nn.
             # evaluate
             loss = loss_fn(y_pred, y_batch)
             losses.append(loss.item())
-            print(loss.item())
             # backward pass
             loss.backward()
             optimizer.step()
