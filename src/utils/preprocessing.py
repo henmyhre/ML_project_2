@@ -37,6 +37,7 @@ def create_sparse_matrix_pytorch(device, df, cross_correlate = True):
     coo_matrix_rows = []
     coo_matrix_cols = []
     coo_matrix_data = []
+    labels = []
     
     df["labels"] = df["labels"].replace(-1, 0)
     labels = []
@@ -74,7 +75,7 @@ def create_sparse_matrix_pytorch(device, df, cross_correlate = True):
     print("Putting into sparse...")
     # Create sparseamatrix
     factor_matrix = torch.sparse_coo_tensor([coo_matrix_rows, coo_matrix_cols], coo_matrix_data, device=device)
-    return factor_matrix, torch.tensor(labels)
+    return factor_matrix.to(device=device), torch.tensor(labels).to(device=device)
 
 def seq_into_binary(sequence):
     """
