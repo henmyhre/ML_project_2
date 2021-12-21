@@ -10,29 +10,21 @@ import time
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score
 
-def train(gpu = False):
-    
-    device = torch.device('cpu')
-    if gpu:
-        device = torch.device('cuda')
+def train():
         
     raw_data = load_data()
     # Create sparse matrix
-<<<<<<< HEAD
     input_data, labels = transform_data(raw_data)
-=======
-    input_data, labels = create_sparse_matrix_pytorch(device, raw_data[:500])
->>>>>>> 51aa49a9564e6827dd82db0a66464e6c7c623834
     # Create model, input size is size of feature lenght
-    model = create_model(device, input_data.size()[1])
+    model = create_model(input_data.size()[1])
     # Train model
-    train_model(device, model, input_data, labels)  
+    train_model(model, input_data, labels)  
     return model
 
 
-def create_model(device, input_size, hidden_size = 100):
+def create_model(input_size, hidden_size = 100):
     """This function creates a model""" 
-    model = BinaryClassfier(input_size = input_size, hidden_size = hidden_size).to(device=device)
+    model = BinaryClassfier(input_size = input_size, hidden_size = hidden_size)
     return model
 
 
@@ -66,7 +58,7 @@ def get_performance(y_true, y_pred):
     return accuracy, F_score
 
 
-def train_model(device, model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfunc=nn.BCEWithLogitsLoss()):
+def train_model(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfunc=nn.BCEWithLogitsLoss()):
     """This funtion trains the model. First raw data is loaded,
     then for each batch this is translated. The model is trained 
     on these batches. This reapeted for n epochs"""
@@ -83,21 +75,21 @@ def train_model(device, model, X, labels, batch_size = 500, epoch = 100, lr=1e-2
     
     for k in range(epoch):
         # Different indices for test and training every round, "shuffles" the data
-        indices = build_indices_batches(labels, batch_size).to(device=device)
+        indices = build_indices_batches(labels, batch_size)
         
         # Train
         for i in range(indices.size()[0] - 1): # Last batch kept for performace evaluation
             print("Training on batch ",i,"...")
             x_batch = X[indices[i,:]].float()
             y_batch = labels[indices[i,:]].float()
-            #x_batch = X.index_select(0, indices[i,:]).to_dense().float().to(device=device)  # Get dense representation
-            #y_batch = labels.index_select(0, indices[i,:]).float().to(device=device)
+            #x_batch = X.index_select(0, indices[i,:]).to_dense().float()  # Get dense representation
+            #y_batch = labels.index_select(0, indices[i,:]).float()
             
             # set optimizer to zero grad
             optimizer.zero_grad()   
             # forward pass
-            y_pred = model.forward(x_batch).to(device=device)
-            y_pred = y_pred.reshape(y_batch.size()).to(device=device)
+            y_pred = model.forward(x_batch)
+            y_pred = y_pred.reshape(y_batch.size())
             # evaluate
             loss = loss_fn(y_pred, y_batch)
             losses.append(loss.item())
@@ -109,11 +101,11 @@ def train_model(device, model, X, labels, batch_size = 500, epoch = 100, lr=1e-2
         # Get performance after epoch
         x_batch = X[indices[-1,:]].float()
         y_batch = labels[indices[-1,:]].float()
-       # x_batch = X.index_select(0, indices[-1,:]).to_dense().float().to(device=device)  # Get dense representation
-       # y_batch = labels.index_select(0, indices[-1,:]).float().to(device=device)
+       # x_batch = X.index_select(0, indices[-1,:]).to_dense().float()  # Get dense representation
+       # y_batch = labels.index_select(0, indices[-1,:]).float()
         # get pred
-        y_pred = model.forward(x_batch).to(device=device)
-        y_pred = y_pred.reshape(y_batch.size()).to(device=device)
+        y_pred = model.forward(x_batch)
+        y_pred = y_pred.reshape(y_batch.size())
         # Get metrics
         accuracy, F_score = get_performance(y_batch, y_pred)
         
