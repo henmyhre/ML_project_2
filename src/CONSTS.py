@@ -15,3 +15,5 @@ PROTEIN_ENCODING = dict()
 BINARY_ENCODING = dict()
 
 DF_SEQ_COLUMNS = ["names", "seq_encoded", "label"]
+
+TEMP_SPARSE_MATRIX = []

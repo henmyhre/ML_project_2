@@ -2,8 +2,6 @@ from Bio import SeqIO
 from src.CONSTS import * 
 from src.utils.utils import *
 import time
-import pandas as pd
-import tqdm
 import numpy as np
 import torch
  
@@ -19,7 +17,7 @@ def create_encoding_dictionaries():
     # Inverse dictionary
     BINARY_ENCODING[str(PROTEIN_ENCODING[letter])] = letter
     
-def create_sparse_matrix_pytorch(df, cross_correlate = True):
+def create_sparse_matrix_pytorch(device, df, cross_correlate = True):
     """This function creates a sparse matrix for all the raw input vectors. These are very 
     sparse because they are one-hot encoded.
     param: df: pd.DataFrame, containing the amino acid sequences in start_seq and end_seq
@@ -56,7 +54,7 @@ def create_sparse_matrix_pytorch(df, cross_correlate = True):
             print("At index", index)
     print("Putting into sparse...")
     # Create sparseamatrix
-    factor_matrix = torch.sparse_coo_tensor([coo_matrix_rows, coo_matrix_cols], coo_matrix_data)
+    factor_matrix = torch.sparse_coo_tensor([coo_matrix_rows, coo_matrix_cols], coo_matrix_data, device=device)
     return factor_matrix
 
 def seq_into_binary(sequence):
