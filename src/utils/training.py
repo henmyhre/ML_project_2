@@ -16,8 +16,7 @@ def train(gpu = False):
         
     raw_data = load_data()
     # Create sparse matrix
-    input_data = create_sparse_matrix_pytorch(device, raw_data)
-    labels = get_labels(raw_data).to(device=device)
+    input_data, labels = create_sparse_matrix_pytorch(device, raw_data[100:300])
     # Create model, input size is size of feature lenght
     model = create_model(device, input_data.size()[1])
     # Train model
@@ -36,11 +35,6 @@ def load_data():
                         names = ["name","start_seq", "end_seq", "labels"], sep=';')
     return data
 
-
-def get_labels(df):
-    """This function gets the labels defined in data[labels] and return as tensor"""
-    labels = df["labels"].replace(-1, 0)
-    return torch.tensor(labels.values)
 
 
 def build_indices_batches(y, interval, seed=None):
@@ -110,7 +104,7 @@ def train_model(device, model, X, labels, batch_size = 100, epoch = 10, lr=1e-6,
         accuracy, F_score = get_performance(y_batch, y_pred)
         
         
-        print("Epoch ",i," finished, total time taken:", time.time()-start)
+        print("Epoch ",k," finished, total time taken:", time.time()-start)
         print("Accuracy is: %.4f and F1-score is: %.4f" %(accuracy, F_score))
             
 

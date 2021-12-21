@@ -17,8 +17,9 @@ def create_encoding_dictionaries():
 
     # Inverse dictionary
     BINARY_ENCODING[str(PROTEIN_ENCODING[letter])] = letter
-    
-def create_sparse_matrix_pytorch(df, cross_correlate = True):
+  
+  
+def create_sparse_matrix_pytorch(device, df, cross_correlate = True):
     """
     This function creates a sparse matrix to use for training. These are very 
     sparse because the amino acid sequences are one-hot encoded. 
@@ -37,10 +38,14 @@ def create_sparse_matrix_pytorch(df, cross_correlate = True):
     coo_matrix_cols = []
     coo_matrix_data = []
     
+    df["labels"] = df["labels"].replace(-1, 0)
+    labels = []
+    
     col_index = 0
     while not df.empty:   
         row = df.iloc[-1]   # Read last row
         df = df.iloc[:-1]   # Delete last row to save memory
+        labels.append(row["labels"].item())
         if cross_correlate:
             # one-hot encode amino acid sequences and add together
             one_hot = add_binary_sequences(seq_into_binary(row["start_seq"]),
@@ -64,12 +69,12 @@ def create_sparse_matrix_pytorch(df, cross_correlate = True):
         col_index +=1
         
         if col_index % 1000 == 0:
-            print("At index", index)
+            print("At index", col_index)
             
     print("Putting into sparse...")
     # Create sparseamatrix
     factor_matrix = torch.sparse_coo_tensor([coo_matrix_rows, coo_matrix_cols], coo_matrix_data, device=device)
-    return factor_matrix
+    return factor_matrix, torch.tensor(labels)
 
 def seq_into_binary(sequence):
     """
