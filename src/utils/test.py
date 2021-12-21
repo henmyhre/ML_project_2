@@ -1,7 +1,6 @@
 from src.utils.model_utils import *
 
-def test(model, test_data):
-    input_data, labels = transform_data(test_data)
+def test(model, input_data, labels):
     # Get performance after epoch
     x_test = input_data.float()
     y_test = labels.float()
