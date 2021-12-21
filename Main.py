@@ -1,5 +1,5 @@
 from src.utils.preprocessing import preprocessing
-from src.utils.training import train
+from src.utils.training import train, create_model
 from src.utils.utils import load_train_test_data
 from src.utils.test import test
 from src.utils.model_utils import transform_data
@@ -14,11 +14,9 @@ def main():
     raw_data = load_train_test_data()
     input_data, labels = transform_data(raw_data)
     
-    train_input_data, test_input_data = torch.split(input_data, input_data.size()[0]*0.8)
-    train_labels, test_labels = torch.split(labels, labels.size()[0]*0.8)
     
-    train(model, train_input_data, train_labels, false_per_true)
-    test(model, test_input_data, test_labels)
+    model = create_model(input_data.size()[1])
+    train(model, input_data, labels, false_per_true)
     
     return model
 
