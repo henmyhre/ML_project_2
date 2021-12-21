@@ -8,7 +8,8 @@ import torch
 
 def create_encoding_dictionaries(): 
   """"
-  Creates protein encoding dictionaries fro hot key encoding.
+  Creates protein encoding dictionaries for hot key encoding.
+  The output is saved in the constants
   """
   for index, letter in enumerate(UNIQUE_CHARS):
     PROTEIN_ENCODING[letter] = [0 for _ in range(len(UNIQUE_CHARS))]
@@ -17,50 +18,65 @@ def create_encoding_dictionaries():
     # Inverse dictionary
     BINARY_ENCODING[str(PROTEIN_ENCODING[letter])] = letter
     
-def create_sparse_matrix_pytorch(device, df, cross_correlate = True):
-    """This function creates a sparse matrix for all the raw input vectors. These are very 
-    sparse because they are one-hot encoded.
+def create_sparse_matrix_pytorch(df, cross_correlate = True):
+    """
+    This function creates a sparse matrix to use for training. These are very 
+    sparse because the amino acid sequences are one-hot encoded. 
+    The aminoacid sequences are first made into binary and added together. 
+    Aftewards, nonzero entries indices and values are found.
     param: df: pd.DataFrame, containing the amino acid sequences in start_seq and end_seq
+           cross_correlate: bool, if true, sequences are cross correlated
+           
     retrun: output: sparse array.
     """
+    
     print("Creating sparse matrix...")
     # TODO: add matrices while hot encoded or mutliply after dimension reduction?
+    # Initialize list to save coordiantes and values of non-zero entries
     coo_matrix_rows = []
     coo_matrix_cols = []
     coo_matrix_data = []
-    index = 0
+    
+    col_index = 0
     while not df.empty:   
-        row = df.iloc[-1]     #Delete last row when it gets read out
-        df = df.iloc[:-1]
-    # for index, row in tqdm(df.iterrows(), total=df.shape[0]):
+        row = df.iloc[-1]   # Read last row
+        df = df.iloc[:-1]   # Delete last row to save memory
         if cross_correlate:
+            # one-hot encode amino acid sequences and add together
             one_hot = add_binary_sequences(seq_into_binary(row["start_seq"]),
                                         seq_into_binary(row["end_seq"]))
         else:
-            one_hot = np.empty((1, row["end_seq"]*2))
-            one_hot[0,:len(row["start_seq"])] = row["start_seq"]
-            one_hot[0,len(row["end_seq"]):] = row["end_seq"]
-        
+            # One hot encode amino acid sequences and put both ends into an array
+            len_one_hot = len(row["end_seq"])*2*len(PROTEIN_ENCODING)
+            one_hot = np.empty((1, len_one_hot))
+            one_hot[0,:int(len_one_hot/2)] = seq_into_binary(row["start_seq"]).flatten()
+            one_hot[0,int(len_one_hot/2):] = seq_into_binary(row["end_seq"]).flatten()
+            one_hot = one_hot[0]
+            
         # Find Nonzero indices
-        non_zero= np.flatnonzero(one_hot)
-        # save row and col coordinates
+        non_zero = np.flatnonzero(one_hot)
+        # Save row and col coordinates
         coo_matrix_cols.extend(non_zero.tolist())
-        coo_matrix_rows.extend([index] * len(non_zero))
-        # Non zero values 
+        coo_matrix_rows.extend([col_index] * len(non_zero))
+        # Save non zero values 
         coo_matrix_data.extend(one_hot[non_zero].tolist())
-        # Increase index
-        index +=1
-        if index % 1000 == 0:
+        # Increase col_index
+        col_index +=1
+        
+        if col_index % 1000 == 0:
             print("At index", index)
+            
     print("Putting into sparse...")
     # Create sparseamatrix
     factor_matrix = torch.sparse_coo_tensor([coo_matrix_rows, coo_matrix_cols], coo_matrix_data, device=device)
     return factor_matrix
 
 def seq_into_binary(sequence):
-    """This function translates an aminoacid sequence into a one-hot encoded sequence
+    """
+    This function translates an aminoacid sequence into a one-hot encoded sequence
     param:  sequence: list
-    return: encoded: ndarray"""
+    return: encoded: ndarray
+    """
 
     encoded = list()
     for letter in sequence:
@@ -73,7 +89,8 @@ def add_binary_sequences(start, end):
     
     param:  start:  ndarray
             end:   ndarray
-    return: output: ndarray"""
+    return: output: ndarray
+    """
     
     output = list()
     
