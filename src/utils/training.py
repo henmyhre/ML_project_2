@@ -25,7 +25,14 @@ def build_indices_batches(y, interval, seed=None):
     return torch.tensor(k_indices).long()
 
 
-def train(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfunc=nn.BCEWithLogitsLoss()):
+def create_weights(y_pred, true_weight):
+    w = y_pred.clone()
+    w[w==0] = 1
+    w[w==1] = true_weight
+    return w
+    
+
+def train(model, X, labels, false_per_true, batch_size = 500, epoch = 100, lr=1e-2, lossfunc=nn.BCEWithLogitsLoss()):
     """This funtion trains the model. First raw data is loaded,
     then for each batch this is translated. The model is trained 
     on these batches. This reapeted for n epochs"""
@@ -57,7 +64,7 @@ def train(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfunc=nn.
             y_pred = model.forward(x_batch)
             y_pred = y_pred.reshape(y_batch.size())
             # evaluate
-            loss = loss_fn(y_pred, y_batch)
+            loss = loss_fn(y_pred, y_batch, weights=create_weights(y_pred, false_per_true))
             losses.append(loss.item())
             # backward pass
             loss.backward()

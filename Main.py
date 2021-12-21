@@ -7,7 +7,9 @@ import torch
 
 
 def main(): 
-    preprocessing(force_save_seq = False, false_per_true = 1)
+    
+    false_per_true = 1
+    preprocessing(force_save_seq = True, false_per_true = false_per_true)
     
     raw_data = load_train_test_data()
     input_data, labels = transform_data(raw_data)
@@ -15,8 +17,7 @@ def main():
     train_input_data, test_input_data = torch.split(input_data, input_data.size()[0]*0.8)
     train_labels, test_labels = torch.split(labels, labels.size()[0]*0.8)
     
-    
-    train(model, train_input_data, train_labels)
+    train(model, train_input_data, train_labels, false_per_true)
     test(model, test_input_data, test_labels)
     
     return model
