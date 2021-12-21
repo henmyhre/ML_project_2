@@ -45,7 +45,6 @@ def create_sparse_matrix_pytorch(device, df, cross_correlate = True):
     col_index = 0
     while not df.empty:   
         row = df.iloc[-1]   # Read last row
-        labels.append(row["labels"])
         df = df.iloc[:-1]   # Delete last row to save memory
         labels.append(row["labels"].item())
         if cross_correlate:
@@ -76,7 +75,7 @@ def create_sparse_matrix_pytorch(device, df, cross_correlate = True):
     print("Putting into sparse...")
     # Create sparseamatrix
     factor_matrix = torch.sparse_coo_tensor([coo_matrix_rows, coo_matrix_cols], coo_matrix_data, device=device)
-    return factor_matrix, torch.tensor(labels)
+    return factor_matrix.to(device=device), torch.tensor(labels).to(device=device)
 
 def seq_into_binary(sequence):
     """
