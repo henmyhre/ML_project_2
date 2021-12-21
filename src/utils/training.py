@@ -47,9 +47,9 @@ def build_indices_batches(y, interval, seed=None):
 
 def get_performance(y_true, y_pred):
         
-    y_true = y_true.cpu().numpy()
+    y_true = y_true.numpy()
     
-    y_pred = y_pred.cpu().detach()
+    y_pred = y_pred.detach()
     sig = torch.nn.Sigmoid()
     y_pred = sig(y_pred)
     y_pred = np.round(y_pred.numpy())
