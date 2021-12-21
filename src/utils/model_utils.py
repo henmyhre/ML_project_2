@@ -55,8 +55,8 @@ def create_one_hot_encoded(df):
             labels: list
     """
     
-    begin_one_hot = np.empty((len(df), len(PROTEIN_ENCODING)*len(df["start_seq"][0])))
-    end_one_hot = np.empty((len(df), len(PROTEIN_ENCODING)*len(df["end_seq"][0])))
+    begin_one_hot = np.empty((len(df), len(PROTEIN_ENCODING)*len(df["start_seq"].iloc[0])))
+    end_one_hot = np.empty((len(df), len(PROTEIN_ENCODING)*len(df["end_seq"].iloc[0])))
     
     df["labels"] = df["labels"].replace(-1, 0)
     labels = list()
@@ -81,12 +81,13 @@ def pca_transform(data, n = 300):
            n: int
     return: ndarray
     """
-  
     pca = IncrementalPCA(n_components = n, batch_size=500)
     pca.fit(data)
     print("Variance explained:",pca.explained_variance_ratio_.sum())
-    
     return pca.transform(data)
+   
+    
+    
     
 
 def get_performance(y_true, y_pred):
