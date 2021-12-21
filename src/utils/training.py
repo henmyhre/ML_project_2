@@ -6,15 +6,13 @@ from src.utils.preprocessing import *
 from src.utils.preprocess_pca import transform_data
 
 import torch
-import time
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score
 
-def train():
-        
-    raw_data = load_data()
+def train(train_data):
     # Create sparse matrix
-    input_data, labels = transform_data(raw_data)
+    input_data, labels = transform_data(train_data)
+
     # Create model, input size is size of feature lenght
     model = create_model(input_data.size()[1])
     # Train model
@@ -28,13 +26,6 @@ def create_model(input_size, hidden_size = 100):
     return model
 
 
-def load_data():
-    data = pd.read_csv(train_test_sample_file_path,
-                        names = ["name","start_seq", "end_seq", "labels"], sep=';')
-    return data
-
-
-
 def build_indices_batches(y, interval, seed=None):
     """build k indices for k-fold."""
     num_row = y.shape[0]
@@ -43,19 +34,6 @@ def build_indices_batches(y, interval, seed=None):
     indices = np.random.permutation(num_row)
     k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
     return torch.tensor(k_indices).long()
-
-
-def get_performance(y_true, y_pred):
-        
-    y_true = y_true.numpy()
-    
-    y_pred = y_pred.detach()
-    sig = torch.nn.Sigmoid()
-    y_pred = sig(y_pred)
-    y_pred = np.round(y_pred.numpy())
-    accuracy = accuracy_score(y_true, y_pred)
-    F_score = f1_score(y_true, y_pred)
-    return accuracy, F_score
 
 
 def train_model(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfunc=nn.BCEWithLogitsLoss()):
@@ -69,16 +47,14 @@ def train_model(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfu
     
     # Set to training mode
     model.train()
-    
-    start = time.time()
-    losses =list()
+    losses = list()
     
     for k in range(epoch):
         # Different indices for test and training every round, "shuffles" the data
         indices = build_indices_batches(labels, batch_size)
         
         # Train
-        for i in range(indices.size()[0] - 1): # Last batch kept for performace evaluation
+        for i in range(indices.size()[0]): # Last batch kept for performace evaluation
             print("Training on batch ",i,"...")
             x_batch = X[indices[i,:]].float()
             y_batch = labels[indices[i,:]].float()
@@ -97,21 +73,6 @@ def train_model(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfu
             # backward pass
             loss.backward()
             optimizer.step()
-
-        # Get performance after epoch
-        x_batch = X[indices[-1,:]].float()
-        y_batch = labels[indices[-1,:]].float()
-       # x_batch = X.index_select(0, indices[-1,:]).to_dense().float()  # Get dense representation
-       # y_batch = labels.index_select(0, indices[-1,:]).float()
-        # get pred
-        y_pred = model.forward(x_batch)
-        y_pred = y_pred.reshape(y_batch.size())
-        # Get metrics
-        accuracy, F_score = get_performance(y_batch, y_pred)
-        
-        
-        print("Epoch ",k," finished, total time taken:", time.time()-start)
-        print("Accuracy is: %.4f and F1-score is: %.4f" %(accuracy, F_score))
         
     plt.plot(np.array(losses))
     
