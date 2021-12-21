@@ -1,5 +1,4 @@
 from src.CONSTS import * 
-import pandas as pd
 import numpy as np
 from src.CONSTS import *
 import umap
@@ -7,9 +6,6 @@ import time
 import torch
 import scipy.sparse
 from tqdm import tqdm
-import sympy
-import sklearn.datasets
-import sklearn.feature_extraction.text
 import umap
 
 
