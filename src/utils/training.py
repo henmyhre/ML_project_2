@@ -16,8 +16,9 @@ def train(gpu = False):
         
     raw_data = load_data()
     # Create sparse matrix
-    input_data = create_sparse_matrix_pytorch(device, raw_data)
-    labels = get_labels(raw_data).to(device=device)
+    input_data, labels = create_sparse_matrix_pytorch(device, raw_data)
+    labels = labels.to(device=device)
+    #labels = get_labels(raw_data).to(device=device)
     # Create model, input size is size of feature lenght
     model = create_model(device, input_data.size()[1])
     # Train model
@@ -27,7 +28,7 @@ def train(gpu = False):
 
 def create_model(device, input_size, hidden_size = 100):
     """This function creates a model""" 
-    model = BinaryClassfier(device, input_size = input_size, hidden_size = hidden_size)
+    model = BinaryClassfier(input_size = input_size, hidden_size = hidden_size).to(device=device)
     return model
 
 
