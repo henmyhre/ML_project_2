@@ -2,16 +2,14 @@ import pandas as pd
 import numpy as np
 from src.CONSTS import *
 from src.utils.classifier import *
-from src.utils.preprocessing import *
-from src.utils.preprocess_pca import transform_data
+from src.utils.model_utils import transform_data
 
 import torch
 import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, f1_score
 
 def train(train_data):
     # Create sparse matrix
-    input_data, labels = transform_data(train_data)
+    input_data, labels = transform_data(train_data, compare = False)
 
     # Create model, input size is size of feature lenght
     model = create_model(input_data.size()[1])
@@ -55,7 +53,6 @@ def train_model(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfu
         
         # Train
         for i in range(indices.size()[0]): # Last batch kept for performace evaluation
-            print("Training on batch ",i,"...")
             x_batch = X[indices[i,:]].float()
             y_batch = labels[indices[i,:]].float()
             #x_batch = X.index_select(0, indices[i,:]).to_dense().float()  # Get dense representation
@@ -69,7 +66,6 @@ def train_model(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfu
             # evaluate
             loss = loss_fn(y_pred, y_batch)
             losses.append(loss.item())
-            print(loss.item())
             # backward pass
             loss.backward()
             optimizer.step()
