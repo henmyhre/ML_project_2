@@ -48,20 +48,22 @@ def create_sparse_matrix_pytorch(df, cross_correlate = True):
             one_hot = add_binary_sequences(seq_into_binary(row["start_seq"]),
                                         seq_into_binary(row["end_seq"]))
         else:
-            # One hot encode amino acid sequences
-            one_hot = np.empty((1, row["end_seq"]*2))
-            one_hot[0,:len(row["start_seq"])] = row["start_seq"]
-            one_hot[0,len(row["end_seq"]):] = row["end_seq"]
-        
+            # One hot encode amino acid sequences and put both ends into an array
+            len_one_hot = len(row["end_seq"])*2*len(PROTEIN_ENCODING)
+            one_hot = np.empty((1, len_one_hot))
+            one_hot[0,:int(len_one_hot/2)] = seq_into_binary(row["start_seq"]).flatten()
+            one_hot[0,int(len_one_hot/2):] = seq_into_binary(row["end_seq"]).flatten()
+            one_hot = one_hot[0]
+            
         # Find Nonzero indices
-        non_zero= np.flatnonzero(one_hot)
+        non_zero = np.flatnonzero(one_hot)
         # Save row and col coordinates
         coo_matrix_cols.extend(non_zero.tolist())
         coo_matrix_rows.extend([col_index] * len(non_zero))
         # Save non zero values 
         coo_matrix_data.extend(one_hot[non_zero].tolist())
         # Increase col_index
-        index +=1
+        col_index +=1
         
         if col_index % 1000 == 0:
             print("At index", index)
