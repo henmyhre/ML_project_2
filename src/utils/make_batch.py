@@ -11,8 +11,6 @@ import sympy
 import sklearn.datasets
 import sklearn.feature_extraction.text
 import umap
-import umap.plot
-import matplotlib.pyplot as plt
 
 
 def create_sparse_matrix_pytorch(df, cross_correlate = True):
@@ -54,6 +52,7 @@ def create_sparse_matrix_pytorch(df, cross_correlate = True):
     # Create sparseamatrix
     factor_matrix = torch.sparse_coo_tensor([coo_matrix_rows, coo_matrix_cols], coo_matrix_data)
     return factor_matrix
+  
 
   
 def create_sparse_matrix_scipy(df, cross_correlate = True):
