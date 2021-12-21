@@ -18,16 +18,15 @@ def transform_data(df, compare = True):
     
     begin, end, labels = create_one_hot_encoded(df)
     
+    begin_reduced = pca_transform(begin, n = 400)
+    end_reduced = pca_transform(end, n = 400)
+    
     if compare:
-        begin_reduced = pca_transform(begin, n = 400)
-        end_reduced = pca_transform(end, n = 400)
         # Compare by mulitplication  
         return torch.tensor(begin_reduced*end_reduced), torch.tensor(labels)
-      
-    else:
-        begin_end = np.concatenate((begin, end))
-        begin_end_reduced = pca_transform(begin_end, n = 400)
-        return torch.tensor(begin_end_reduced), torch.tensor(labels)
+    
+    begin_end_reduced = np.concatenate((begin_reduced, end_reduced), axis=1)
+    return torch.tensor(begin_end_reduced), torch.tensor(labels)
       
       
  

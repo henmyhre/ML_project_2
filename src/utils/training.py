@@ -6,11 +6,15 @@ import time
 from src.utils.test import test
 import torch
 import matplotlib.pyplot as plt
+from src.utils.logistic_regression import LogisticRegression
 
 
-def create_model(input_size, hidden_size = 100):
+def create_model(input_size, net = True, hidden_size = 100):
     """This function creates a model""" 
-    model = BinaryClassfier(input_size = input_size, hidden_size = hidden_size)
+    if net:
+        model = BinaryClassfier(input_size = input_size, hidden_size = hidden_size)
+    else:
+        model = LogisticRegression(input_size = input_size)
     return model
 
 
@@ -31,7 +35,7 @@ def create_weights(y_pred, true_weight):
     return w
 
 
-def train(model, input_data, labels, false_per_true, batch_size = 500, epoch = 20, lr=1e-2, lossfunc=nn.BCEWithLogitsLoss()):
+def train(model, input_data, labels, false_per_true, batch_size = 500, epoch = 40, lr=1e-4, lossfunc=nn.BCEWithLogitsLoss()):
     """This funtion trains the model. First raw data is loaded,
     then for each batch this is translated. The model is trained 
     on these batches. This reapeted for n epochs"""
@@ -70,7 +74,8 @@ def train(model, input_data, labels, false_per_true, batch_size = 500, epoch = 2
             y_pred = model.forward(x_batch)
             y_pred = y_pred.reshape(y_batch.size())
             # evaluate
-            loss = loss_fn(y_pred, y_batch, weights=create_weights(y_pred, false_per_true))
+           # loss = loss_fn(y_pred, y_batch, pos_weight=torch.tensor([1, false_per_true]))
+            loss = loss_fn(y_pred, y_batch)
             losses.append(loss.item())
             # backward pass
             loss.backward()

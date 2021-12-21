@@ -12,10 +12,11 @@ def main():
     preprocessing(force_save_seq = True, false_per_true = false_per_true)
     
     raw_data = load_train_test_data()
-    input_data, labels = transform_data(raw_data)
+    input_data, labels = transform_data(raw_data, compare = False)
     
     
     model = create_model(input_data.size()[1])
+    
     train(model, input_data, labels, false_per_true)
     
     return model
