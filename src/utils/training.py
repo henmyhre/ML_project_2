@@ -5,7 +5,6 @@ from src.utils.classifier import *
 from src.utils.preprocessing import *
 import torch
 import time
-import tqdm
 from sklearn.metrics import accuracy_score, f1_score
 
 
@@ -47,9 +46,9 @@ def transform_raw_data(data, reduce=False):
     return: output: ndarray or sparse array"""
   
     sparse = create_sparse_matrix_pytorch(data)
-    if reduce:
-        reduced = reduce_dimensionality(sparse)
-        return reduced
+    # if reduce:
+    #     reduced = reduce_dimensionality(sparse)
+    #     return reduced
     
     return sparse
 
