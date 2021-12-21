@@ -1,23 +1,12 @@
-import pandas as pd
 import numpy as np
 from src.CONSTS import *
 from src.utils.classifier import *
 from src.utils.preprocessing import *
-from src.utils.preprocess_pca import transform_data
+from src.utils.model_utils import *
+import time
 
 import torch
 import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, f1_score
-
-def train(train_data):
-    # Create sparse matrix
-    input_data, labels = transform_data(train_data)
-
-    # Create model, input size is size of feature lenght
-    model = create_model(input_data.size()[1])
-    # Train model
-    train_model(model, input_data, labels)  
-    return model
 
 
 def create_model(input_size, hidden_size = 100):
@@ -36,7 +25,7 @@ def build_indices_batches(y, interval, seed=None):
     return torch.tensor(k_indices).long()
 
 
-def train_model(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfunc=nn.BCEWithLogitsLoss()):
+def train(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfunc=nn.BCEWithLogitsLoss()):
     """This funtion trains the model. First raw data is loaded,
     then for each batch this is translated. The model is trained 
     on these batches. This reapeted for n epochs"""
@@ -48,6 +37,8 @@ def train_model(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfu
     # Set to training mode
     model.train()
     losses = list()
+    
+    start = time()
     
     for k in range(epoch):
         # Different indices for test and training every round, "shuffles" the data
@@ -73,6 +64,8 @@ def train_model(model, X, labels, batch_size = 500, epoch = 100, lr=1e-2, lossfu
             # backward pass
             loss.backward()
             optimizer.step()
+            
+        print("Epoch ",k," finished, total time taken:", time.time()-start)
         
     plt.plot(np.array(losses))
     

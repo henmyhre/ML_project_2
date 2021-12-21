@@ -38,7 +38,7 @@ def split_sequence(sequence):
 def get_time_dif_str(start):
     return "Time: " + str(int(time.time() - start))
 
-def load_data():
+def load_train_test_data():
     data = pd.read_csv(train_test_sample_file_path,
                         names = ["name","start_seq", "end_seq", "labels"], sep=';')
     return data
