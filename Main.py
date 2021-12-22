@@ -26,8 +26,8 @@ def main():
             for lr in LR:
               for number in [50, 100, 150, 200]:
                 model = create_model(input_data.size()[1], net = model_type, hidden_size_1=number)
-                model_type = model_type + ", " + str(number)
-                train(model, input_data, labels, false_per_true, model_name = model_type, lr = lr)
+                name = model_type + ", " + str(number)
+                train(model, input_data, labels, false_per_true, model_name = name, lr = lr)
         
     return model
 

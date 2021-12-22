@@ -85,8 +85,18 @@ def pca_transform(data, n = 300):
     print("Variance explained:",pca.explained_variance_ratio_.sum())
     return pca.transform(data)
    
-    
-    
+
+def test(model, input_data, labels):
+    # Get performance after epoch
+    x_test = input_data.float()
+    y_test = labels.float()
+    # get pred
+    y_pred = model.forward(x_test)
+    y_pred = y_pred.reshape(y_test.size())
+    # Get metrics
+    accuracy, F_score = get_performance(y_test, y_pred)
+        
+    return accuracy, F_score
     
 
 def get_performance(y_true, y_pred):

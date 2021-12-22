@@ -6,7 +6,6 @@ import time
 from src.CONSTS import *
 from src.utils.classifier import *
 from src.utils.model_utils import *
-from src.utils.test import test
 from src.utils.utils import plot_result
 
 
