@@ -26,5 +26,10 @@ LR = [1, 1e-1, 1e-3, 1e-4, 1e-5]
 NEURAL_NET_1 = "One layer neural net"
 NEURAL_NET_2 = "Two layer neural net"
 LOGISTIC_REGRESSION = "Logistic regression"
-MODEL_TYPE = [NEURAL_NET_1, NEURAL_NET_2]
+MODEL_TYPE = [LOGISTIC_REGRESSION, NEURAL_NET_1, NEURAL_NET_2]
+
+ADD = "add"
+MULTIPLY = "multiply"
+CONCATENATE = "concatenate"
+COMPARE = [ADD, MULTIPLY, CONCATENATE]
 

@@ -42,17 +42,29 @@ def get_time_dif_str(start):
     return "Time: " + str(int(time.time() - start))
 
 def load_train_test_data(file_name):
+    """Load a file into a dataframe.
+    param: file_name: str
+    return: data: pd.DataFrame"""
+    
     data = pd.read_csv(file_name,
                         names = ["name","start_seq", "end_seq", "labels"], sep=';')
     return data
   
   
-def plot_result(data, x_label, y_label, lr, model_name, false_per_true):
+def plot_result(data, x_label, y_label, model_name):
+    """
+    Plot the input data and safe under the concatenation of model_name and y_label.
+    param: data: list
+           x_label: str
+           y_label: str
+           model_name: str
+    """
     plt.plot(np.array(data))
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.title('For learning rate =' + str(lr) + ', model is ' + model_name + ". False/true ratio is:" + str(false_per_true))
-    plt.savefig('generated/'+y_label+'_'+str(lr)+'_'+model_name+'_'+str(false_per_true)+'.png', bbox_inches = 'tight')
+    hfont = {'fontname':'Helvetica'}
+    plt.xlabel(x_label, **hfont)
+    plt.ylabel(y_label, **hfont)
+   # plt.title('For learning rate =' + str(lr) + ', model is ' + model_name + ". False/true ratio is:" + str(false_per_true))
+    plt.savefig('generated/'+ model_name + '_' + y_label + '.png', bbox_inches = 'tight')
     
     plt.show()
   

@@ -9,7 +9,7 @@ import torch
 def create_encoding_dictionaries(): 
   """"
   Creates protein encoding dictionaries for hot key encoding.
-  The output is saved in the constants
+  The output is saved in the constants.
   """
   for index, letter in enumerate(UNIQUE_CHARS):
     PROTEIN_ENCODING[letter] = [0 for _ in range(len(UNIQUE_CHARS))]

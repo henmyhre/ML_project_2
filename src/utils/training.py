@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import torch.nn as nn
 import time
 
 # Import from other files
@@ -9,12 +10,23 @@ from src.utils.model_utils import *
 from src.utils.utils import plot_result
 
 
-def create_model(input_size, net = NEURAL_NET_1, hidden_size_1 = 100, hidden_size_2 = 20):
-    """This function creates a model""" 
-    if net == NEURAL_NET_2:
+def create_model(input_size, model_type = NEURAL_NET_1, hidden_size_1 = 100, hidden_size_2 = 20):
+    """
+    This function creates a learning model, a one layered neural network, atwo layered neural network
+    or a logistic regressor.
+    
+    param: input_size: int, size of the input vector
+           model_type: str, "One layer neural net", "Two layer neural net" or "Logistic regression"
+           hidden_size_1: int, size of first hidden layer, if model_type is a neural net
+           hidden_size_2: int, size of second hidden layer, if mode_type is a two layered neural net
+           
+    return: model: Module
+    """ 
+    
+    if model_type == NEURAL_NET_2:
         model = BinaryClassfier_two_layer(input_size, hidden_size_1, hidden_size_2)
         
-    elif net == NEURAL_NET_1:
+    elif model_type == NEURAL_NET_1:
         model = BinaryClassfier_one_layer(input_size, hidden_size_1)
         
     else:
@@ -23,11 +35,17 @@ def create_model(input_size, net = NEURAL_NET_1, hidden_size_1 = 100, hidden_siz
     return model
 
 
-def build_indices_batches(y, interval, seed=None):
-    """build k indices for k-fold."""
+def build_indices_batches(y, interval):
+    """
+    Build indices for the batches. Creates random groups of indices with groupsize of interval and maximum index
+    equal to the length of y.
+    param: y: torch.tensor
+           interval: int
+    return: torch.tensor.long
+    """
+    
     num_row = y.shape[0]
     k_fold = int(num_row / interval)
-    #np.random.seed(seed)
     indices = np.random.permutation(num_row)
     k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
     return torch.tensor(k_indices).long()
@@ -40,18 +58,29 @@ def create_weights(y_pred, true_weight):
     return w
 
 
-def train(model, input_data, labels, false_per_true, model_name = None, batch_size = 1000, epoch = 100, lr=1e-2):
-    """This funtion trains the model. First raw data is loaded,
+def train(model, input_data, labels, model_name = None, batch_size = 1000, epoch = 100, lr=1e-2):
+    """
+    This funtion trains the model. First raw data is loaded,
     then for each batch this is translated. The model is trained 
-    on these batches. This reapeted for n epochs"""
+    on these batches. This reapeted for n epochs.
+    
+    param: model: Module
+           input_data: torch.tensor
+           labels: torch.tensor
+           model_name: str, save performance measures under this name
+           batch_size: int
+           epoch: int
+           lr: float, learning rate used
+    """
+    
     # split data
     split_size = int(input_data.size()[0]*0.8)
     train_input_data, test_input_data = torch.split(input_data, split_size)
     train_labels, test_labels = torch.split(labels, split_size)
     
     # initialize optimzer and lossfunc
-    loss_fn = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    loss_fn = nn.BCEWithLogitsLoss()
     
     # Set to training mode
     model.train()
@@ -96,13 +125,14 @@ def train(model, input_data, labels, false_per_true, model_name = None, batch_si
         #print("Epoch ",k," finished, total time taken:", time.time()-start)
     
     # Show performance
-    plot_result(losses, 'training step', 'Loss', lr, model_name, false_per_true)
-    plot_result(accuracies, 'Epoch', 'Accuracy', lr, model_name, false_per_true)
-    plot_result(f_scores, 'Epoch', 'F1-score', lr, model_name, false_per_true)
+    plot_result(losses, 'training step', 'Loss', model_name)
+    plot_result(accuracies, 'Epoch', 'Accuracy', model_name)
+    plot_result(f_scores, 'Epoch', 'F1-score', model_name)
  
     
     print("Final accuracy is: %.4f and final F-score is %.4f" %(accuracy, F_score))
     print("Total time was %.4f" %(time.time()-start))
+    print(model_name)
     
     
             

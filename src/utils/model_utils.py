@@ -1,12 +1,12 @@
 from sklearn.metrics import accuracy_score, f1_score
 import torch
 import numpy as np
-from src.CONSTS import PROTEIN_ENCODING
+from src.CONSTS import PROTEIN_ENCODING, ADD, MULTIPLY
 from sklearn.decomposition import IncrementalPCA
 
 
 
-def transform_data(df, compare = True):
+def transform_data(df, compare = None):
     """
     This function transforms the raw data into input data for the learning algorithm
     and into the corrseponding labels.
@@ -21,7 +21,11 @@ def transform_data(df, compare = True):
     begin_reduced = pca_transform(begin, n = 300)
     end_reduced = pca_transform(end, n = 300)
     
-    if compare:
+    if compare == ADD:
+        # Compare by mulitplication  
+        return torch.tensor(begin_reduced+end_reduced), torch.tensor(labels)
+    
+    elif compare == MULTIPLY:
         # Compare by mulitplication  
         return torch.tensor(begin_reduced*end_reduced), torch.tensor(labels)
     
@@ -87,7 +91,16 @@ def pca_transform(data, n = 300):
    
 
 def test(model, input_data, labels):
-    # Get performance after epoch
+    """"
+    This function tests a given model with input_data and labels and returns accuracy and F1-score
+    param: model: Module
+           input_data: torch.tensor
+           labels: torch.tensor
+    return: accuracy: float
+            F_score: float
+    """
+    
+    # Ensure data is right type
     x_test = input_data.float()
     y_test = labels.float()
     # get pred
@@ -100,13 +113,23 @@ def test(model, input_data, labels):
     
 
 def get_performance(y_true, y_pred):
-        
+    """
+    This fucntion gets the performance of a prediction.
+    param: y_true: torch.tensor, true labels
+           y_pred: torch.tensor, predicted labels
+    return: accuracy: float
+            F_score: float
+    """
+    # Change type, so it will properly work in the sklearn function of accuracy_score and f1_score
     y_true = y_true.numpy()
     
+    # Get labels of the prediction
     y_pred = y_pred.detach()
     sig = torch.nn.Sigmoid()
     y_pred = sig(y_pred)
     y_pred = np.round(y_pred.numpy())
+    
+    # Get performance
     accuracy = accuracy_score(y_true, y_pred)
     F_score = f1_score(y_true, y_pred)
     return accuracy, F_score
