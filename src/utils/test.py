@@ -10,7 +10,7 @@ def test(model, input_data, labels):
     # Get metrics
     accuracy, F_score = get_performance(y_test, y_pred)
     
-    print("Accuracy is: %.4f and F1-score is: %.4f" %(accuracy, F_score))
+    #print("Accuracy is: %.4f and F1-score is: %.4f" %(accuracy, F_score))
     
     return accuracy, F_score
     

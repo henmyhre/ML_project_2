@@ -18,8 +18,8 @@ def transform_data(df, compare = True):
     
     begin, end, labels = create_one_hot_encoded(df)
     
-    begin_reduced = pca_transform(begin, n = 400)
-    end_reduced = pca_transform(end, n = 400)
+    begin_reduced = pca_transform(begin, n = 300)
+    end_reduced = pca_transform(end, n = 300)
     
     if compare:
         # Compare by mulitplication  

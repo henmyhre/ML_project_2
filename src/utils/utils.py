@@ -1,6 +1,9 @@
 import random 
 import time
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
 from src.CONSTS import *
 
 
@@ -38,7 +41,27 @@ def split_sequence(sequence):
 def get_time_dif_str(start):
     return "Time: " + str(int(time.time() - start))
 
-def load_train_test_data():
-    data = pd.read_csv(train_test_sample_file_path,
+def load_train_test_data(file_name):
+    data = pd.read_csv(file_name,
                         names = ["name","start_seq", "end_seq", "labels"], sep=';')
     return data
+  
+  
+def plot_result(data, x_label, y_label, lr, model_name, false_per_true):
+    plt.plot(np.array(data))
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title('For learning rate =' + str(lr) + ', model is ' + model_name + ". False/true ratio is:" + str(false_per_true))
+    plt.savefig('generated/'+y_label+'_'+str(lr)+'_'+model_name+'_'+str(false_per_true)+'.png', bbox_inches = 'tight')
+    
+    plt.show()
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
