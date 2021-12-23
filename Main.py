@@ -15,29 +15,30 @@ def main():
             
         raw_data = load_train_test_data(file)
         
-        # Differ modes of comparing/ non-comparing begin and end (add, multiply, concatenate)
-        for comparison in [ADD, MULTIPLY, CONCATENATE]:
+        # Differ modes of comparing/ non-comparing begin and end
+        for operation in [ADD, MULTIPLY, CONCATENATE]:
             
-            input_data, labels = transform_data(raw_data, compare = comparison)
+            input_data, labels = transform_data(raw_data, compare = operation)
+            input_size = input_data.size()[1]
             
             for model_type in [LOGISTIC_REGRESSION, NEURAL_NET_1, NEURAL_NET_2]:
                 for lr in [1e-1, 1e-3, 1e-4]:
+                    
+                    # File name for saving performance 
+                    file_name = str(false_per_true) + '_' + operation + '_' + model_type + '_' + str(lr)
+                    
                     if model_type is not LOGISTIC_REGRESSION:
                         # Try different sizes for the first layer of the neural network
-                        for number in [50, 100, 150, 200]:
-                            model = create_model(input_data.size()[1], model_type = model_type, hidden_size_1 = number)
-                            # Set file name to save performance
-                            file_name = str(false_per_true) + '_' + comparison + '_' + model_type + "_" + str(number) + '_' + str(lr)
-                            # Train model and safe performance after every epoch
-                            train(model, input_data, labels, model_name = file_name, lr = lr)
-                            
+                        for hidden_layer_size in [50, 100, 150, 200]:
+                            model = create_model(input_size, model_type, hidden_size_1 = hidden_layer_size)
+                            file_name = file_name + '_' + str(hidden_layer_size) 
+                            # Train model and save performance after every epoch
+                            train(model, input_data, labels, model_name = file_name, lr = lr) 
+                              
                     else:
-                        model = create_model(input_data.size()[1], model_type = model_type)
-                        # Set file name to save performance
-                        file_name = str(false_per_true) + '_' + comparison + '_' + model_type + '_' + str(lr)
-                        # Train model and safe performance after every epoch
+                        model = create_model(input_size, model_type)
+                        # Train model and save performance after every epoch
                         train(model, input_data, labels, model_name = file_name, lr = lr)
-                        
-    return model
 
-model = main()
+
+main()

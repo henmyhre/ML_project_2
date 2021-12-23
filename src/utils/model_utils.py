@@ -3,14 +3,16 @@ import torch
 import numpy as np
 from src.CONSTS import PROTEIN_ENCODING, ADD, MULTIPLY
 from sklearn.decomposition import IncrementalPCA
+import matplotlib.pyplot as plt
 
 
 
-def transform_data(df, compare = None):
+def transform_data(df, operation = None):
     """
     This function transforms the raw data into input data for the learning algorithm
     and into the corrseponding labels.
     param: df: pd.DataFrame
+           operation: Type of operation between start and end sequences
     
     return: torch.tensor
             torch.tensor
@@ -21,16 +23,18 @@ def transform_data(df, compare = None):
     begin_reduced = pca_transform(begin, n = 300)
     end_reduced = pca_transform(end, n = 300)
     
-    if compare == ADD:
-        # Compare by mulitplication  
-        return torch.tensor(begin_reduced+end_reduced), torch.tensor(labels)
+    labels_tensor = torch.tensor(labels)
     
-    elif compare == MULTIPLY:
+    if operation == ADD:
         # Compare by mulitplication  
-        return torch.tensor(begin_reduced*end_reduced), torch.tensor(labels)
+        return torch.tensor(begin_reduced+end_reduced), labels_tensor
+    
+    elif operation == MULTIPLY:
+        # Compare by mulitplication  
+        return torch.tensor(begin_reduced*end_reduced), labels_tensor
     
     begin_end_reduced = np.concatenate((begin_reduced, end_reduced), axis=1)
-    return torch.tensor(begin_end_reduced), torch.tensor(labels)
+    return torch.tensor(begin_end_reduced), labels_tensor
       
       
  
@@ -133,3 +137,21 @@ def get_performance(y_true, y_pred):
     accuracy = accuracy_score(y_true, y_pred)
     F_score = f1_score(y_true, y_pred)
     return accuracy, F_score
+
+
+def plot_result(data, x_label, y_label, model_name):
+    """
+    Plot the input data and safe under the concatenation of model_name and y_label.
+    param: data: list
+           x_label: str
+           y_label: str
+           model_name: str
+    """
+    plt.plot(np.array(data))
+    hfont = {'fontname':'Helvetica'}
+    plt.xlabel(x_label, **hfont)
+    plt.ylabel(y_label, **hfont)
+   # plt.title('For learning rate =' + str(lr) + ', model is ' + model_name + ". False/true ratio is:" + str(false_per_true))
+    plt.savefig('generated/'+ model_name + '_' + y_label + '.png', bbox_inches = 'tight')
+    
+    plt.show()

@@ -53,6 +53,7 @@ def split_raw_data_file():
 def create_train_test_data(false_per_true):
     """
     Saves all true data and a random sample of the false data to a file for training and testing.
+    return: train_test_sample_file_path: str
     """
     
     true_amount = NUM_OF_SEQUENCES
@@ -62,15 +63,15 @@ def create_train_test_data(false_per_true):
     
     clear_file(train_test_sample_file_path)
     
-    append_csv_rows_to_new_csv(SEQ_TRUE_FILE_PATH, train_test_sample_file_path, true_amount)
-    append_csv_rows_to_new_csv(SEQ_FALSE_FILE_PATH, train_test_sample_file_path, false_amount)
+    append_file_rows_to_new_file(SEQ_TRUE_FILE_PATH, train_test_sample_file_path, true_amount)
+    append_file_rows_to_new_file(SEQ_FALSE_FILE_PATH, train_test_sample_file_path, false_amount)
     
     return train_test_sample_file_path
 
 
 def preprocessing(force_save_seq = False, false_per_true = 1):
     """
-    From raw data file to file with random train/test data in random order.
+    Proproess the raw data file and save result in train/test file with random sequences in random order.
     """
     if (len(BINARY_ENCODING) == 0) or (len(PROTEIN_ENCODING) == 0):  
         # Create dictionaries for encoding proteins

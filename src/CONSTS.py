@@ -25,6 +25,7 @@ NEURAL_NET_1 = "One layer neural net"
 NEURAL_NET_2 = "Two layer neural net"
 LOGISTIC_REGRESSION = "Logistic regression"
 
+# Operations for comparing start/end sequences
 ADD = "add"
 MULTIPLY = "multiply"
 CONCATENATE = "concatenate"
