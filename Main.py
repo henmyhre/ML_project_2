@@ -13,20 +13,20 @@ def main():
     optim_acc = np.zeros((2, 3, 3, 3, 3))  
                
     # Try false/true ratio one and false/true ratio 4
-    for i_file, file in enumerate([TRAIN_TEST_DATA_PATH_1_1, TRAIN_TEST_DATA_PATH_1_4]):
+    for i_file, file in enumerate(FILES):
 
         false_per_true = get_false_true_ratio_from_filename(file)  
         raw_data = load_train_test_data(file)
         
         # Differ modes of comparing/ non-comparing begin and end (add, multiply, concatenate)
-        for i_comp, operation in enumerate([ADD, MULTIPLY, CONCATENATE]):
+        for i_comp, operation in enumerate(OPERATIONS):
             
             input_data, labels = transform_data(raw_data, compare = operation)
             input_size = input_data.size()[1]
             
             # Try different models: logistic regression, one layer neural network and two layer neural network
-            for i_mod, model_type in enumerate([LOGISTIC_REGRESSION, NEURAL_NET_1, NEURAL_NET_2]):
-                for i_lr, lr in enumerate([1e-1, 1e-3, 1e-4]):
+            for i_mod, model_type in enumerate(MODEL_TYPES):
+                for i_lr, lr in enumerate(LEARNING_RATES):
                   
                     # File name for saving performance 
                     file_name = str(false_per_true) + '_' + operation + '_' + model_type + '_' + str(lr)
