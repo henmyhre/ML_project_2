@@ -2,12 +2,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 import time
-
-# Import from other files
 from src.CONSTS import *
 from src.utils.classifier import *
 from src.utils.model_utils import *
-from src.utils.utils import plot_result
 
 
 def create_model(input_size, model_type = NEURAL_NET_1, hidden_size_1 = 100, hidden_size_2 = 20):
