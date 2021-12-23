@@ -3,6 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class BinaryClassfier_two_layer(nn.Module):
+    """
+    Initializes a neural network with two hidden layers.
+    """
     def __init__(self, input_size, hidden_size_1=100, hidden_size_2=20):
         super(BinaryClassfier_two_layer, self).__init__()
         self.linear_1 = nn.Linear(input_size, hidden_size_1)
@@ -16,6 +19,9 @@ class BinaryClassfier_two_layer(nn.Module):
 
 
 class BinaryClassfier_one_layer(nn.Module):
+    """
+    Initializes a neural network with one hidden layers.
+    """
     def __init__(self, input_size, hidden_size_1=100):
         super(BinaryClassfier_one_layer, self).__init__()
         self.linear_1 = nn.Linear(input_size, hidden_size_1)
@@ -28,6 +34,9 @@ class BinaryClassfier_one_layer(nn.Module):
     
       
 class LogisticRegression(torch.nn.Module):
+    """
+    Initializes a logistic regression model.
+    """
     def __init__(self, input_size, output_size = 1):
         super(LogisticRegression, self).__init__()
         self.linear = torch.nn.Linear(input_size, output_size)
