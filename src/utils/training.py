@@ -10,7 +10,7 @@ from src.utils.model_utils import *
 from src.utils.utils import plot_result
 
 
-def create_model(input_size, model_type = NEURAL_NET_1, hidden_size_1 = 100, hidden_size_2 = 20):
+def create_model(input_size, model_type = NEURAL_NET_1, hidden_size_1 = 100, hidden_size_2 = 10):
     """
     This function creates a learning model, a one layered neural network, atwo layered neural network
     or a logistic regressor.
@@ -71,6 +71,8 @@ def train(model, input_data, labels, model_name = None, batch_size = 1000, epoch
            batch_size: int
            epoch: int
            lr: float, learning rate used
+    return :float, final F1-score
+           :float, final accuracy
     """
     
     # split data
@@ -81,7 +83,6 @@ def train(model, input_data, labels, model_name = None, batch_size = 1000, epoch
     # initialize optimzer and lossfunc
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     loss_fn = nn.BCEWithLogitsLoss()
-    
     # Set to training mode
     model.train()
     
@@ -107,7 +108,7 @@ def train(model, input_data, labels, model_name = None, batch_size = 1000, epoch
             
             # forward pass
             y_pred = model.forward(x_batch)
-            y_pred = y_pred.reshape(y_batch.size())
+            y_batch = y_batch.reshape(y_pred.size())
                     
             # evaluate
             loss = loss_fn(y_pred, y_batch)
@@ -129,10 +130,11 @@ def train(model, input_data, labels, model_name = None, batch_size = 1000, epoch
     plot_result(accuracies, 'Epoch', 'Accuracy', model_name)
     plot_result(f_scores, 'Epoch', 'F1-score', model_name)
  
-    
     print("Final accuracy is: %.4f and final F-score is %.4f" %(accuracy, F_score))
     print("Total time was %.4f" %(time.time()-start))
     print(model_name)
+    
+    return f_scores[-1], accuracies[-1]
     
     
             

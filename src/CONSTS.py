@@ -22,7 +22,7 @@ DF_SEQ_COLUMNS = ["names", "seq_encoded", "label"]
 
 
 # Optimize learning technique
-LR = [1, 1e-1, 1e-3, 1e-4, 1e-5]
+LR = [1e-1, 1e-3, 1e-4]
 NEURAL_NET_1 = "One layer neural net"
 NEURAL_NET_2 = "Two layer neural net"
 LOGISTIC_REGRESSION = "Logistic regression"
