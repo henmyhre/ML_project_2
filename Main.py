@@ -1,8 +1,8 @@
 from src.utils.preprocessing import preprocessing
 from src.utils.training import train, create_model
-from src.utils.utils import load_train_test_data, get_false_true_ratio_from_filename,show_performance
+from src.utils.utils import load_train_test_data, get_false_true_ratio_from_filename
 from src.CONSTS import *
-from src.utils.model_utils import transform_data
+from src.utils.model_utils import transform_data, show_performance
 import numpy as np
 
 def main(): 
@@ -21,7 +21,7 @@ def main():
         # Differ modes of comparing/ non-comparing begin and end (add, multiply, concatenate)
         for i_comp, operation in enumerate(OPERATIONS):
             
-            input_data, labels = transform_data(raw_data, compare = operation)
+            input_data, labels = transform_data(raw_data, operation = operation)
             input_size = input_data.size()[1]
             
             # Try different models: logistic regression, one layer neural network and two layer neural network
@@ -46,13 +46,11 @@ def main():
                         model = create_model(input_size, model_type = model_type)
                         # Train model and safe performance after every epoch
                         f_score, accuracy = train(model, input_data, labels, model_name = file_name, lr = lr)
-                        
-                        optim_f[i_file, i_comp, i_mod, i_lr, 0] = f_score
-                        optim_acc[i_file, i_comp, i_mod,i_lr, 0] = accuracy
-                        
-    show_performance(optim_f,  optim_acc)                    
-                        
-
+                        optim_f[i_file, i_comp, i_mod, i_lr, i_size] = f_score
+                        optim_acc[i_file, i_comp, i_mod, i_lr, i_size] = accuracy
+                            
+    show_performance(optim_f, optim_acc)    
+                
 main()
 
 

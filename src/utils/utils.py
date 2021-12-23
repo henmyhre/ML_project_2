@@ -110,7 +110,7 @@ def get_false_true_ratio_from_filename(filename):
     param: filename: str
     return: int
     """
-    return int(filename.split(".")[0][-1])
+    return int(filename.split(".")[1][-1])
 
   
   
