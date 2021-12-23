@@ -33,14 +33,14 @@ def main():
                     
                     if model_type is not LOGISTIC_REGRESSION:
                         # Try different sizes for the first layer of the neural network
-                        for i_num, number in enumerate([50, 100, 200]):
-                            model = create_model(input_size, model_type = model_type, hidden_size_1=number)
+                        for i_size, hidden_layer_size in enumerate([50, 100, 200]):
+                            model = create_model(input_size, model_type = model_type, hidden_size_1=hidden_layer_size)
                             file_name = file_name + '_' + str(hidden_layer_size) 
                             # Train model and safe performance after every epoch
                             f_score, accuracy = train(model, input_data, labels, model_name = file_name, lr = lr)
                             
-                            optim_f[i_file, i_comp, i_mod, i_lr, i_num] = f_score
-                            optim_acc[i_file, i_comp, i_mod, i_lr, i_num] = accuracy
+                            optim_f[i_file, i_comp, i_mod, i_lr, i_size] = f_score
+                            optim_acc[i_file, i_comp, i_mod, i_lr, i_size] = accuracy
                             
                     else:
                         model = create_model(input_size, model_type = model_type)
