@@ -79,26 +79,24 @@ def preprocessing(force_save_seq = False, false_per_true = 1):
         
     start = time.time()
     
-# =============================================================================
-#     if force_save_seq:        
-#         print(get_time_dif_str(start), "Starting saving to files")
-#         
-#         split_raw_data_file()
-#         print(get_time_dif_str(start), "Done saving to files true false files. Shuffling...")
-#         
-#         shuffle_file_rows(SEQ_FALSE_FILE_PATH)
-#         print(get_time_dif_str(start), "Done shuffling. Saving preprocessed data...")
-#     
-#     else:
-#         print("Skipped creating true/false files. Saving preprocessed data...")
-#         
-#     train_test_data_file = create_train_test_data(false_per_true)
-#     print(get_time_dif_str(start), "Done saving preprocessed data. Shuffling...")
-#     
-#     shuffle_file_rows(train_test_data_file)
-#     print(get_time_dif_str(start), "Done with shuffling. \n Done with preprocessing!:)")
-#     
-# =============================================================================
+    if force_save_seq:        
+        print(get_time_dif_str(start), "Starting saving to files")
+        
+        split_raw_data_file()
+        print(get_time_dif_str(start), "Done saving to files true false files. Shuffling...")
+        
+        shuffle_file_rows(SEQ_FALSE_FILE_PATH)
+        print(get_time_dif_str(start), "Done shuffling. Saving preprocessed data...")
+    
+    else:
+        print("Skipped creating true/false files. Saving preprocessed data...")
+        
+    train_test_data_file = create_train_test_data(false_per_true)
+    print(get_time_dif_str(start), "Done saving preprocessed data. Shuffling...")
+    
+    shuffle_file_rows(train_test_data_file)
+    print(get_time_dif_str(start), "Done with shuffling. \n Done with preprocessing!:)")
+    
     
 
   
