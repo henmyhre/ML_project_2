@@ -68,7 +68,46 @@ def plot_result(data, x_label, y_label, model_name):
     
     plt.show()
   
-  
+def show_performance(optim_f, optim_acc):
+    """This function shows the performance of various training configurations.
+    param: optim_f: ndarray
+           optim_acc: ndarray"""
+    
+    
+    shape = (len(FILES), len(COMPARE), len(MODEL_TYPE), len(LR), 3)
+    # Find best performance logistic regression
+    index = np.unravel_index(optim_f[:, :, 0,:, :].argmax(), shape)
+    print("The best performance for logistic regression was accuracy of %.4f and F-score of %.4f" %(optim_acc[index], optim_f[index]))
+    print("Coordinates:", index)
+    # Find best performance concatenating logistci regression
+    index = np.unravel_index(optim_f[:, 2, 0, :, :].argmax(), shape)
+    print("The best performance for logistic regression with concatenating sequences was accuracy of %.4f and F-score of %.4f" %(optim_acc[index], optim_f[index]))
+    print("Coordinates:", index)
+    # Find best overall performance
+    index = np.unravel_index(optim_f.argmax(), shape)
+    print("The best performance overall was accuracy of %.4f and F-score of %.4f" %(optim_acc[index], optim_f[index]))
+    print("Coordinates:", index)
+    # Find best One layer performance
+    index = np.unravel_index(optim_f[:, :, 1,:,:].argmax(), shape)
+    print("The best performance One layer was accuracy of %.4f and F-score of %.4f" %(optim_acc[index], optim_f[index]))
+    print("Coordinates:", index)
+    # Find best adding performance
+    index = np.unravel_index(optim_f[:,0,:,:,:].argmax(), shape)
+    print("The best adding performance  was accuracy of %.4f and F-score of %.4f" %(optim_acc[index], optim_f[index]))
+    print("Coordinates:", index)
+    # Find best multiplying performance
+    index = np.unravel_index(optim_f[:,1,:,:,:].argmax(), shape)
+    print("The est multiplying performance was accuracy of %.4f and F-score of %.4f" %(optim_acc[index], optim_f[index]))
+    print("Coordinates:", index)
+    #Find best 1to1 performance
+    index = np.unravel_index(optim_f[0,:,:,:,:].argmax(), shape)
+    print("The best 1to1 performance was accuracy of %.4f and F-score of %.4f" %(optim_acc[index], optim_f[index]))
+    print("Coordinates:", index)
+    #find best 4to1 performance
+    index = np.unravel_index(optim_f[1,:,:,:,:].argmax(), shape)
+    print("The best 4to1 performance was accuracy of %.4f and F-score of %.4f" %(optim_acc[index], optim_f[index]))
+    print("Coordinates:", index)
+
   
   
   

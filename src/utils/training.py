@@ -10,7 +10,7 @@ from src.utils.model_utils import *
 from src.utils.utils import plot_result
 
 
-def create_model(input_size, model_type = NEURAL_NET_1, hidden_size_1 = 100, hidden_size_2 = 10):
+def create_model(input_size, model_type = NEURAL_NET_1, hidden_size_1 = 100, hidden_size_2 = 20):
     """
     This function creates a learning model, a one layered neural network, atwo layered neural network
     or a logistic regressor.
