@@ -24,7 +24,7 @@ DF_SEQ_COLUMNS = ["names", "seq_encoded", "label"]
 NEURAL_NET_1 = "One layer neural net"
 NEURAL_NET_2 = "Two layer neural net"
 LOGISTIC_REGRESSION = "Logistic regression"
-MODEL_TYPES = [NEURAL_NET_1, NEURAL_NET_2, LOGISTIC_REGRESSION]
+MODEL_TYPES = [LOGISTIC_REGRESSION, NEURAL_NET_1, NEURAL_NET_2]
 
 LEARNING_RATES = [1e-1, 1e-3, 1e-4]
 

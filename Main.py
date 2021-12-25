@@ -46,8 +46,8 @@ def main():
                         model = create_model(input_size, model_type = model_type)
                         # Train model and safe performance after every epoch
                         f_score, accuracy = train(model, input_data, labels, model_name = file_name, lr = lr)
-                        optim_f[i_file, i_comp, i_mod, i_lr, i_size] = f_score
-                        optim_acc[i_file, i_comp, i_mod, i_lr, i_size] = accuracy
+                        optim_f[i_file, i_comp, i_mod, i_lr, 0] = f_score
+                        optim_acc[i_file, i_comp, i_mod, i_lr, 0] = accuracy
                             
     show_performance(optim_f, optim_acc)    
                 

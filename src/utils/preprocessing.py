@@ -39,11 +39,10 @@ def split_raw_data_file():
         for start in seq_start_list:   
             for end in seq_end_list:
                 name_and_seq = start[0] + "<>" + end[0] + ";" + start[1] + ";" + end[1]
-                label = "-1"
-                
                 if start[0] == end[0]: 
-                    label = "1"
-                seq_true_file.write(name_and_seq + ";" + label + "\n")
+                    seq_true_file.write(name_and_seq + ";1\n")
+                else:
+                    seq_false_file.write(name_and_seq + ";-1\n")
 
 
         seq_true_file.close()
